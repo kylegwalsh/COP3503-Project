@@ -81,7 +81,8 @@ string Character::Attack(Character *c)
 		if ((AttPower - c->GetDefPower()) <= 0)
 		{
 			damage = 2;
-		} else
+		}
+		else
 		{
 			damage = 2 * (AttPower - c->GetDefPower());
 		}
@@ -95,7 +96,8 @@ string Character::Attack(Character *c)
 		if ((AttPower - c->GetDefPower()) <= 0)
 		{
 			damage = 1;
-		} else
+		}
+		else
 		{
 			damage = 1 * (AttPower - c->GetDefPower());
 		}
@@ -125,7 +127,6 @@ Player::Player()
 	LevelUpEXP = 100;
 	xLocation = 1;
 	yLocation = 1;
-	PlayerSymbol = '@';
 }
 
 //changes the player's stamina
@@ -143,28 +144,32 @@ void Player::ChangeStamina(int s)
 }
 
 //uses food to heal the player
-void Player::Eat()
+string Player::Eat()
 {
 	if (Food == 0)
 	{
-		cout << "You're out of Food!";
-	} else
+		return "You're out of Food!";
+	}
+	else
 	{
 		Food--;
 		ChangeHealth(20);
+		return "Your health has been restored!";
 	}
 }
 
 //uses Gatorade to restore the player's stamina
-void Player::Drink()
+string Player::Drink()
 {
 	if (Gatorade == 0)
 	{
-		cout << "You're out of Gatorade!";
-	} else
+		return "You're out of Gatorade!";
+	}
+	else
 	{
 		Gatorade--;
 		ChangeStamina(15);
+		return "Your stamina has been restored!";
 	}
 }
 
@@ -187,7 +192,8 @@ void Player::MoveRight()
 	if (Stamina > 0)
 	{
 		ChangeStamina(-1);
-	} else
+	}
+	else
 	{
 		ChangeHealth(-2);
 	}
@@ -200,7 +206,8 @@ void Player::MoveLeft()
 	if (Stamina > 0)
 	{
 		ChangeStamina(-1);
-	} else
+	}
+	else
 	{
 		ChangeHealth(-2);
 	}
@@ -213,7 +220,8 @@ void Player::MoveUp()
 	if (Stamina > 0)
 	{
 		ChangeStamina(-1);
-	} else
+	}
+	else
 	{
 		ChangeHealth(-2);
 	}
@@ -226,7 +234,8 @@ void Player::MoveDown()
 	if (Stamina > 0)
 	{
 		ChangeStamina(-1);
-	} else
+	}
+	else
 	{
 		ChangeHealth(-2);
 	}
@@ -323,6 +332,11 @@ void Player::PrintCombatStats()
 {
 	cout << "Albert: " << "Level[" << Level << "], Health[" << Health << "/"
 			<< MaxHealth << "], Food[" << Food << "]\n";
+}
+
+void SetSaveStats() const
+{
+
 }
 //*************************************
 
@@ -505,7 +519,7 @@ int main()
 {
 	Player p;
 	Bat e;
-	string pAttack;
+	string pAction;
 	string eAttack;
 	int n;
 
@@ -545,13 +559,13 @@ int main()
 		//option 1. Attack
 		if(n==1)
 		{
-			pAttack=p.Attack(&e);
+			pAction=p.Attack(&e);
 			eAttack=e.Attack(&p);
 		}
 		//option 2. Eat
 		if(n==2)
 		{
-			p.Eat();
+			pAction=p.Eat();
 			eAttack=e.Attack(&p);
 		}
 		//option 3. Flee
@@ -563,14 +577,12 @@ int main()
 		//checks to see if player or enemy is dead
 		if(p.GetHealth()==0)
 		{
-			//Game Over Function with GameOverScrn (for now I'll just say you died)
-			cout << "Albert died!\n";
-			break;
+			return false;
 		}
 		if(e.GetHealth()==0)
 		{
 			p.GainExperience(e);
-			break;
+			return true;
 		}
 
 		p.PrintCombatStats();
@@ -578,14 +590,7 @@ int main()
 		e.PrintAscii();
 		cout << "1. Attack  2. Eat  3. Flee" << endl;
 
-		if(n==1)
-		{
-			cout << pAttack << endl;
-		}
-		if(n==2)
-		{
-			cout << "Albert ate and gained 20 Health.\n";
-		}
+		cout << pAction << endl;
 		cout << eAttack << endl;
 	}
 }

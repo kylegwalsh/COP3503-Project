@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <random>
 using namespace std;
 
@@ -32,7 +33,7 @@ public:
 	int GetDefPower();
 	string GetName();
 	void ChangeHealth(int h);
-	void Attack(Character c);
+	string Attack(Character *c);
 };
 
 //a subclass holding the player's data
@@ -45,13 +46,12 @@ private:
 	int LevelUpEXP;
 	int xLocation;
 	int yLocation;
-	char PlayerSymbol;
 
 public:
 	Player();
 	void ChangeStamina(int s);
-	void Eat();
-	void Drink();
+	string Eat();
+	string Drink();
 	void LevelUp();
 	void MoveRight();
 	void MoveLeft();
@@ -70,6 +70,7 @@ public:
 	int GetyLocation();
 	void PrintMapStats();
 	void PrintCombatStats();
+	vector<int> const &GetSaveStats() const;
 };
 
 //a subclass holding enemy's data
