@@ -1,11 +1,4 @@
-#include <iostream>
-#include <string>
-#include <conio.h>
-#include <ctime>
-
-int level = 1;
-Map m;
-string message = "";
+#include "game.h"
 
 void game()
 {
@@ -23,7 +16,7 @@ void game()
 	}
 }
 
-bool combat(Enemy enemy, Player* al)
+bool Game::combat(Enemy enemy)
 {
 	
 }
@@ -38,8 +31,11 @@ void doStuff(char place)
 	//end with prev position
 }
 
-void playLevel(Player* al)
+void Game::playLevel()
 {
+	random_device rd;
+	mt19937 gen(rd());
+	
 	char dir;
 	int x, y;
 	string place;
@@ -141,7 +137,7 @@ void playLevel(Player* al)
 			 if (place.compare("H") == 0)
 			 {
 				 doStuff('H');
-				 //find key, gatorade, food, or monster?
+				 //find key, food, or monster?
 			 }
 			 else if (place.compare("T") == 0)
 			 {
@@ -150,7 +146,8 @@ void playLevel(Player* al)
 			 else if(place.compare("G") == 0)
 			 {
 				 doStuff('G');
-				 //get gatorade, how much?
+				 //get gatorade, 3-5
+				 
 			 }
 			 else if (place.compare("M") == 0)
 			 {
@@ -178,7 +175,7 @@ void playLevel(Player* al)
 					 }
 					 else
 					 {
-						 alive = combat(type2[lev-2], al);
+						 alive = combat(type2[lev-1], al);
 					 }
 				 }
 			 }
@@ -191,13 +188,15 @@ void playLevel(Player* al)
 	}
 }
 
-void printMap()
+void Game::printMap()
 
-void update()
+void Game::update()
 {
 	int spaces = (20-m.getRows())/2;
 	//prints screen
-	cout<<" ----------------------------------------------------------------------- \n";
+	cout<<" ======================================================================= \n";
+	cout<<"| "<<al->PrintMapStats()<<string(69-(al->PrintMapStats().size()), ' ')<<"|\n";
+	cout<<"|-----------------------------------------------------------------------|\n";
 	for (int i=0; i<spaces; i++)
 	{
 		cout<<"|                                                                       |\n";
@@ -212,6 +211,6 @@ void update()
 	cout<<"|                                                                       |\n";
 	cout<<"|  Controls: wasd - move		q - quit	other controls?                |\n";
 	cout<<"|                                                                       |\n";
-	cout<<" ----------------------------------------------------------------------- \n";
+	cout<<" ======================================================================= \n";
 	
 }
