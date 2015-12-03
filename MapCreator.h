@@ -17,28 +17,25 @@ private:
 	std::vector<std::string> map; 
 	int rows;
 	int columns;
-	int bossX;
-	static const int bossY = 0;
 	//number of diffferent areas
 	int gatoradeMachines; //Representation G
 	int houseNum; //Representation H
  	int barracksNum; //M
 	int towerNum; //T
-	int obstacleNum;
-
+	
 	void assignAreaAmounts();
 	void assignHeightWidth();
 	void createBasicMap();
 	void addEnvironment();
-	void addObstacles();
 	void save();
 	bool isIsolated(int c, int r);
+	void printMap();
 
 public:
 	MapCreator();
 	MapCreator(int level);
-
-	void printMap();
+	void createNewLevel();
+	void addLevel();
 };
 
 #endif //MAP_CREATOR_H

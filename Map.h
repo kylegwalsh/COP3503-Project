@@ -3,26 +3,30 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
+#include <iostream>
 
 class Map 
 {
 private:
-	std::vector< std::vector<std::string> > mapData; 
+	std::vector< std::vector<std::string> >  mapData; 
 	std::vector< std::vector<int>  > boolAllowableArea; //1 - true, 0-false
 	int columns; //x
 	int rows; //y
 	std::string fileName;
+	int level;
 
 	void readMapData();
 	void initializeAllowableArea();
-	vector
+	void importMap();
 
 public:
 	Map();
-	Map(int level);
 	int getColumns();
 	int getRows();
+	void loadNext();
 	std::vector< std::vector<std::string> > const &getMapData() const;
+	std::vector< std::vector<int> > const &getAllowableArea() const;
 };
 
 #endif //MAP_H

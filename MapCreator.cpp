@@ -2,56 +2,56 @@
 
 int main()
 {
-	MapCreator mc(3);
-	mc.printMap();
-	return 0;
-}
-
-void MapCreator::printMap()
-{
-	for (int i=0; i<rows; i++)
+	MapCreator mc();
+	for (int i=0; i<3; i++)
 	{
-		for (int j=0; j<columns; j++)
-		{
-			std::cout << map[(i*columns)+j];
-		}
-		std::cout << "\n";
+		mc.createNewLevel();
+		mc.addLevel();
 	}
+	return 0;
 }
 
 MapCreator::MapCreator()
 {
-	MapCreator(1);
+	mapLevel = 1;
 }
 
 MapCreator::MapCreator(int level)
 {
 	mapLevel = level;
+}
+
+void MapCreator::createNewLevel()
+{
 	assignHeightWidth();
-	bossX = columns/2;
 	createBasicMap();
 	assignAreaAmounts();
 	addEnvironment();
 	save();
 }
 
+void MapCreator::addLevel()
+{
+	mapLevel+=1;
+}
+
 void MapCreator::assignHeightWidth()
 {
-	columns = 30;
+	columns = (30/2);
 	rows = 10;
 	switch (mapLevel)
 	{
-		case 2: columns = 50; 
+		case 2: columns = (50/2); 
 				rows = 15;
 				break;
 
-		case 3: columns = 70; 
+		case 3: columns = (70/2); 
 				rows = 20;
 				break;
 	}
 	if (mapLevel>3)
 	{
-		columns = 70;
+		columns = (70/2);
 		rows = 20;
 	}
 }
@@ -98,22 +98,25 @@ void MapCreator::createBasicMap()
 
 void MapCreator::addEnvironment()
 {
-	addObstacles();
-	map[bossX] = "B"; // inserting the boss
+	map[columns/2] = "B"; // inserting the boss
 	int objectsToInsert[] = {gatoradeMachines, houseNum, barracksNum, towerNum}; //number of each object type to be inserted
-	char symbols[] = {'G', 'H', 'M', 'T'}; //each object's symbol notation with aligned index
+	std::string symbols[] = {"G", "H", "M", "T"}; //each object's symbol notation with aligned index
 	int tempX, tempY; //changing x-y values for insertion
 	srand(time(0)); //seeding the random number generator
 	for (int i=0; i<(sizeof(objectsToInsert)/sizeof(int)); i++) //for each in objectsToInsert
 	{
 		while (objectsToInsert[i]>0) //while that index still has more to place
 		{
-			tempX = (rand()%columns); //get random x value within 0 to columns
-			tempY = (rand()%rows); //get random y value within 0 to rows
+			tempX = (rand()%(columns-2)+2); //get random x value within 0 to columns
+			tempY = (rand()%(rows-2)+2); //get random y value within 0 to rows
 			if (isIsolated(tempX, tempY)) //if that index is isolated
 			{
 				map[(tempY*columns)+tempX] = symbols[i]; //insert the symbol
-				objectsToInsert[i]--; //decrement 
+				objectsToInsert[i]--; //decrement
+			}
+			else
+			{
+				continue;
 			}
 		}
 	}
@@ -125,23 +128,13 @@ void MapCreator::addEnvironment()
 */
 bool MapCreator::isIsolated(int c, int r)
 {
-	if ((rows-r)<=2 || (rows-r)>=(rows-2) || (columns-c)<=2 || (columns-c)>=(columns-2))
-	{
-		return false;
-	}
-	else
-	{
-		return 
-		(
-			map[(r*columns)+c].compare("\\")==0 && //at index
-			map[(r*columns)+(c-1)].compare("\\")==0 && map[(r*columns)+(c+1)].compare("\\")==0 && //left and right 1
-			map[(r*columns)+(c-2)].compare("\\")==0 && map[(r*columns)+(c+2)].compare("\\")==0 && //left and right 2
-			map[((r+1)*columns)+c].compare("\\")==0 && map[((r-1)*columns)+c].compare("\\")==0 && //top and bottom 1
-			map[((r+2)*columns)+c].compare("\\")==0 && map[((r-2)*columns)+c].compare("\\")==0 && //top and bottom 2
-			map[((r-1)*columns)+(c-1)].compare("\\")==0 && map[((r-1)*columns)+(c+1)].compare("\\")==0 && //top diagonals
-			map[((r+1)*columns)+(c-1)].compare("\\")==0 && map[((r+1)*columns)+(c+1)].compare("\\")==0 //bottom diagonals
-		);
-	}
+	return (map[(r*columns)+c].compare("\\")==0 && //at index
+		(map[(r*columns)+(c-1)].compare("\\")==0 && map[(r*columns)+(c+1)].compare("\\")==0) && //left and right 1
+		(map[(r*columns)+(c-2)].compare("\\")==0 && map[(r*columns)+(c+2)].compare("\\")==0) && //left and right 2
+		(map[((r+1)*columns)+c].compare("\\")==0 && map[((r-1)*columns)+c].compare("\\")==0) && //top and bottom 1
+		(map[((r+2)*columns)+c].compare("\\")==0 && map[((r-2)*columns)+c].compare("\\")==0) && //top and bottom 2
+		(map[((r-1)*columns)+(c-1)].compare("\\")==0 && map[((r-1)*columns)+(c+1)].compare("\\")==0) && //top diagonals
+		(map[((r+1)*columns)+(c-1)].compare("\\")==0 && map[((r+1)*columns)+(c+1)].compare("\\")==0)); //bottom diagonals
 }
 
 void MapCreator::save()
@@ -155,21 +148,17 @@ void MapCreator::save()
 	}
 	else
 	{
-		saveFile << "#" << rows << "$" << columns;
+		saveFile << "#" << rows << std::endl;
+		saveFile << "$" << columns;
 		saveFile << "\n";
 		for (int i=0; i<rows; i++)
 		{
 			for (int j=0; j<columns; j++)
 			{
-				saveFile << map[(i*j)+j];
+				saveFile << map[(i*columns)+j];
 			}
 			saveFile << "\n";
 		}
 	}
 	saveFile.close();
-}
-
-void MapCreator::addObstacles()
-{
-	//todo
 }
