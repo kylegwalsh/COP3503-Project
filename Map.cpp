@@ -1,19 +1,5 @@
 #include "Map.h"
 
-int main()
-{
-	Map m(1);
-	std::vector< std::vector<std::string> > test = m.getMapData();
-	for (int i=0; i<m.getRows(); i++)
-	{
-		for (int j=0; j<m.getColumns(); j++)
-		{
-			std::cout << test[i][j];
-		}
-	}
-	return 0;
-}
-
 Map::Map()
 {
 	level = 1;
