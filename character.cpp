@@ -65,8 +65,6 @@ string Character::Attack(Character *c)
 	uniform_int_distribution<> dis(1, 10);
 	int random = dis(gen);
 	int damage;
-	string dam;
-	ostringstream convert;
 	string s;
 
 	//attack misses
@@ -86,9 +84,7 @@ string Character::Attack(Character *c)
 		{
 			damage = 2 * (AttPower - c->GetDefPower());
 		}
-		convert << damage;
-		dam = convert.str();
-		s = "It's a critical hit! " + Name + " did " + dam + " damage.";
+		s = "It's a critical hit! " + Name + " did " + to_string(damage) + " damage.";
 	}
 	//normal attack
 	if (random > 1 && random < 10)
@@ -101,9 +97,7 @@ string Character::Attack(Character *c)
 		{
 			damage = 1 * (AttPower - c->GetDefPower());
 		}
-		convert << damage;
-		dam = convert.str();
-		s = Name + " did " + dam + " damage.";
+		s = Name + " did " + to_string(damage) + " damage.";
 	}
 	c->ChangeHealth(-damage);
 	return s;
@@ -125,8 +119,8 @@ Player::Player()
 	Level = 1;
 	Experience = 0;
 	LevelUpEXP = 100;
-	xLocation = 1;
-	yLocation = 1;
+	xLocation = 10;
+	yLocation = 7;
 }
 
 //changes the player's stamina
@@ -242,18 +236,11 @@ void Player::MoveDown()
 	yLocation++;
 }
 
-//changes the player's x and y location to the start of the second map
-void Player::MoveToSecondMap()
+//changes the player's x and y location to the start of the next map
+void Player::SetLocation(int x,int y)
 {
-	xLocation = 1;
-	yLocation = 1;
-}
-
-//changes the player's x and y location to the start of the third map
-void Player::MoveToThirdMap()
-{
-	xLocation = 1;
-	yLocation = 1;
+	xLocation = x;
+	yLocation = y;
 }
 
 //gives a defeated enemy's experience to the player
@@ -318,25 +305,55 @@ int Player::GetyLocation()
 	return yLocation;
 }
 
-//prints out the player's stats on the map
-void Player::PrintMapStats()
+//returns the player's stats on the map
+string Player::PrintMapStats()
 {
-	cout << "Level[" << Level << "], EXP[" << Experience << "/" << LevelUpEXP
-			<< "], Health[" << Health << "/" << MaxHealth << "], Stamina["
-			<< Stamina << "/" << MaxStamina << "], Food[" << Food
-			<< "], Gatorade[" << Gatorade << "]\n";
+	return "Level[" + to_string(Level) + "], EXP[" + to_string(Experience) + "/" + to_string(LevelUpEXP)
+			+ "], Health[" + to_string(Health) + "/" + to_string(MaxHealth) + "], Stamina["
+			+ to_string(Stamina) + "/" + to_string(MaxStamina) + "], Food[" + to_string(Food)
+			+ "], Gatorade[" + to_string(Gatorade) + "]\n";
 }
 
-//prints out the player's stats during combat
-void Player::PrintCombatStats()
+//returns the player's stats during combat
+string Player::PrintCombatStats()
 {
-	cout << "Albert: " << "Level[" << Level << "], Health[" << Health << "/"
-			<< MaxHealth << "], Food[" << Food << "]\n";
+	return "Albert: Level[" + to_string(Level) + "], Health[" + to_string(Health) + "/"
+			+ to_string(MaxHealth) + "], Food[" + to_string(Food) + "]\n";
 }
 
-void SetSaveStats() const
+void Player::SaveStats()
 {
+	SavedStats.clear();
+	SavedStats.push_back(Food);
+	SavedStats.push_back(Gatorade);
+	SavedStats.push_back(MaxStamina);
+	SavedStats.push_back(Stamina);
+	SavedStats.push_back(MaxHealth);
+	SavedStats.push_back(Health);
+	SavedStats.push_back(AttPower);
+	SavedStats.push_back(DefPower);
+	SavedStats.push_back(Level);
+	SavedStats.push_back(Experience);
+	SavedStats.push_back(LevelUpEXP);
+	SavedStats.push_back(xLocation);
+	SavedStats.push_back(yLocation);
+}
 
+void Player::RevertStats()
+{
+	Food=SavedStats.at(0);
+	Gatorade=SavedStats.at(1);
+	MaxStamina=SavedStats.at(2);
+	Stamina=SavedStats.at(3);
+	MaxHealth=SavedStats.at(4);
+	Health=SavedStats.at(5);
+	AttPower=SavedStats.at(6);
+	DefPower=SavedStats.at(7);
+	Level=SavedStats.at(8);
+	Experience=SavedStats.at(9);
+	LevelUpEXP=SavedStats.at(10);
+	xLocation=SavedStats.at(11);
+	yLocation=SavedStats.at(12);
 }
 //*************************************
 
@@ -350,11 +367,11 @@ int Enemy::RandomizeLevel(int low, int high)
 	return level;
 }
 
-//prints out the enemy's stats during combat
-void Enemy::PrintEnemyStats()
+//returns the enemy's stats during combat
+string Enemy::PrintEnemyStats()
 {
-	cout << Name << ": " << "Level[" << Level << "], Health[" << Health << "/"
-			<< MaxHealth << "]\n";
+	return  Name + ": Level[" + to_string(Level) + "], Health[" + to_string(Health) + "/"
+			+ to_string(MaxHealth) + "]\n";
 }
 
 //prints out the ascii representation of the monster
@@ -374,8 +391,7 @@ Bat::Bat()
 	AttPower = 4 + Level;
 	DefPower = 1 + Level;
 	Experience = 10 * Level;
-	Ascii =
-			"                  _-.                       .-_\n               _..-\'(                       )`-.._\n            ./\'. \'||\\\\.       (\\_/)       .//||` .`\\.\n         ./\'.|\'.\'||||\\\\|..    )-.-(    ..|//||||`.`|.`\\.\n      ./\'..|\'.|| |||||\\```````  \"  \'\'\'\'\'\'\'/||||| ||.`|..`\\.\n    ./\'.||\'.|||| ||||||||||||.     .|||||||||||| ||||.`||.`\\.\n   /\'|||\'.|||||| ||||||||||||{     }|||||||||||| ||||||.`|||`\\\n  \'.|||\'.||||||| ||||||||||||{     }|||||||||||| |||||||.`|||.`\n \'.||| ||||||||| |/\'   ``\\||/`     \'\\||/\'\'   `\\| ||||||||| |||.`\n |/\' \\./\'     `\\./          |/\\   /\\|          \\./\'     `\\./ `\\|\n V    V         V          }\' `\\ /\' `{          V         V    V\n `    `         `               U               \'         \'    \'\n";
+	Ascii ="                  _-.                       .-_\n               _..-\'(                       )`-.._\n            ./\'. \'||\\\\.       (\\_/)       .//||` .`\\.\n         ./\'.|\'.\'||||\\\\|..    )-.-(    ..|//||||`.`|.`\\.\n      ./\'..|\'.|| |||||\\```````  \"  \'\'\'\'\'\'\'/||||| ||.`|..`\\.\n    ./\'.||\'.|||| ||||||||||||.     .|||||||||||| ||||.`||.`\\.\n   /\'|||\'.|||||| ||||||||||||{     }|||||||||||| ||||||.`|||`\\\n  \'.|||\'.||||||| ||||||||||||{     }|||||||||||| |||||||.`|||.`\n \'.||| ||||||||| |/\'   ``\\||/`     \'\\||/\'\'   `\\| ||||||||| |||.`\n |/\' \\./\'     `\\./          |/\\   /\\|          \\./\'     `\\./ `\\|\n V    V         V          }\' `\\ /\' `{          V         V    V\n `    `         `               U               \'         \'    \'\n";
 }
 
 //creates a Scorpion of a random level between 3-4
@@ -389,8 +405,7 @@ Scorpion::Scorpion()
 	AttPower = 4 + Level;
 	DefPower = 1 + Level;
 	Experience = 10 * Level;
-	Ascii =
-			"     ___ __ \n   _{___{__}\\\n  {_}      `\\)            \n {_}         ;           _.-\'\'\'\'--.._\n {_}                    //\'.--.  \\___`.\n  { }__,_.--~~~-~~~-~~-::.---. `-.\\  `.)\n   `-.{_{_{_{_{_{_{_{_//  -- 8;=- `\n      `-:,_.:,_:,_:,.`\\\\._ ..\'=- , \n          // // // //`-.`\\`   .-\'/\n         << << << <<    \\ `--\'  /----)\n          ^  ^  ^  ^     `-.....--\'\'\'\n";
+	Ascii ="     ___ __ \n   _{___{__}\\\n  {_}      `\\)            \n {_}         ;           _.-\'\'\'\'--.._\n {_}                    //\'.--.  \\___`.\n  { }__,_.--~~~-~~~-~~-::.---. `-.\\  `.)\n   `-.{_{_{_{_{_{_{_{_//  -- 8;=- `\n      `-:,_.:,_:,_:,.`\\\\._ ..\'=- , \n          // // // //`-.`\\`   .-\'/\n         << << << <<    \\ `--\'  /----)\n          ^  ^  ^  ^     `-.....--\'\'\'\n";
 }
 
 //creates the Dragon boss
@@ -404,8 +419,7 @@ Dragon::Dragon()
 	AttPower = 12;
 	DefPower = 6;
 	Experience = 350;
-	Ascii =
-			"           /|                                           |\\\n          /||             ^               ^             ||\\\n         / \\\\__          //               \\\\          __// \\\n        /  |_  \\         | \\   /     \\   / |         /  _|  \\\n       /  /  \\  \\         \\  \\/ \\---/ \\/  /         /  /     \\\n      /  /    |  \\         \\  \\/\\   /\\/  /         /  |       \\\n     /  /     \\   \\__       \\ ( 0\\ /0 ) /       __/   /        \\\n    /  /       \\     \\___    \\ \\_/|\\_/ /    ___/     /\\         \\\n   /  /         \\_)      \\___ \\/-\\|/-\\/ ___/      (_/\\ \\      `  \\\n  /  /           /\\__)       \\/  oVo  \\/       (__/   ` \\      `  \\\n /  /           /,   \\__)    (_/\\ _ /\\_)    (__/         `      \\  \\\n/  \'           //       \\__)  (__V_V__)  (__/                    \\  \\\n  \'  \'        /\'           \\   |{___}|   /         .              \\  \n \'  /        /              \\/ |{___}| \\/\\          `              \\  \n   /        \'       .        \\/{_____}\\/  \\          \\    `         \\  \n  /                ,         /{_______}\\   \\          \\    \\        \n                  /         /{___/_\\___}\\   `          \\    `\n";
+	Ascii ="           /|                                           |\\\n          /||             ^               ^             ||\\\n         / \\\\__          //               \\\\          __// \\\n        /  |_  \\         | \\   /     \\   / |         /  _|  \\\n       /  /  \\  \\         \\  \\/ \\---/ \\/  /         /  /     \\\n      /  /    |  \\         \\  \\/\\   /\\/  /         /  |       \\\n     /  /     \\   \\__       \\ ( 0\\ /0 ) /       __/   /        \\\n    /  /       \\     \\___    \\ \\_/|\\_/ /    ___/     /\\         \\\n   /  /         \\_)      \\___ \\/-\\|/-\\/ ___/      (_/\\ \\      `  \\\n  /  /           /\\__)       \\/  oVo  \\/       (__/   ` \\      `  \\\n /  /           /,   \\__)    (_/\\ _ /\\_)    (__/         `      \\  \\\n/  \'           //       \\__)  (__V_V__)  (__/                    \\  \\\n  \'  \'        /\'           \\   |{___}|   /         .              \\  \n \'  /        /              \\/ |{___}| \\/\\          `              \\  \n   /        \'       .        \\/{_____}\\/  \\          \\    `         \\  \n  /                ,         /{_______}\\   \\          \\    \\        \n                  /         /{___/_\\___}\\   `          \\    `\n";
 }
 
 //creates a Rhino of a random level between 4-5
@@ -419,8 +433,7 @@ Rhino::Rhino()
 	AttPower = 4 + Level;
 	DefPower = 4 + Level;
 	Experience = 10 * Level;
-	Ascii =
-			"                     ,-.             __\n                   ,\'   `---.___.---\'  `.\n                 ,\'   ,-                 `-._\n               ,\'    /                       \\\n            ,\\/     /                        \\\\\n        )`._)>)     |                         \\\\\n        `>,\'    _   \\                  /       |\\\n          )      \\   |   |            |        |\\\\\n .   ,   /        \\  |    `.          |        | ))\n \\`. \\`-\'          )-|      `.        |        /((\n  \\ `-`   o`     _/ ;\\ _     )`-.___.--\\      /  `\'\n   `._         ,\'    \\`j`.__/        \\  `.    \\\n     / ,    ,\'       _)\\   /`        _) ( \\   /\n     \\__   /        /___) (         /____\\_) (\n       `--\'           /____\\             /____\\\n";
+	Ascii ="                     ,-.             __\n                   ,\'   `---.___.---\'  `.\n                 ,\'   ,-                 `-._\n               ,\'    /                       \\\n            ,\\/     /                        \\\\\n        )`._)>)     |                         \\\\\n        `>,\'    _   \\                  /       |\\\n          )      \\   |   |            |        |\\\\\n .   ,   /        \\  |    `.          |        | ))\n \\`. \\`-\'          )-|      `.        |        /((\n  \\ `-`   o`     _/ ;\\ _     )`-.___.--\\      /  `\'\n   `._         ,\'    \\`j`.__/        \\  `.    \\\n     / ,    ,\'       _)\\   /`        _) ( \\   /\n     \\__   /        /___) (         /____\\_) (\n       `--\'           /____\\             /____\\\n";
 }
 
 //creates a Tiger of a random level between 6-7
@@ -434,8 +447,7 @@ Tiger::Tiger()
 	AttPower = 5 + Level;
 	DefPower = 3 + Level;
 	Experience = 10 * Level;
-	Ascii =
-			"   _\n  ( \\                ..-----..__\n   \\.\'.        _.--\'`  \'   \'  \' ```\'-._\n    `. `\'-..-\'\' `    \'  \'      . ;   ; `-\'\'\'-.,__/|/|\n      `\'-.;..-\'\'`|\'  `.  \'.    ;     \'  `    \'   `\'  `,\n                 \\ \'   .    \' .     \'   ;   .`   . \' o \\\n                  \'.\' . \' -.\\     .`   .`  .   .\\     `Y\n                    \'-.\' .   |\\  \'   ,    \'    /\'`--;;\'\n                      /\\   \'.| \'-._ /    \' _.-\'\n                      \\\'\\  \' / (`-.\'.\'  .\"/\n                       \\ )` /   .\'   .-\'./\n                        \'\\  \\).\'  .-\'--\"\n                          \'. `,_\'`\n                            `.__)\n";
+	Ascii ="   _\n  ( \\                ..-----..__\n   \\.\'.        _.--\'`  \'   \'  \' ```\'-._\n    `. `\'-..-\'\' `    \'  \'      . ;   ; `-\'\'\'-.,__/|/|\n      `\'-.;..-\'\'`|\'  `.  \'.    ;     \'  `    \'   `\'  `,\n                 \\ \'   .    \' .     \'   ;   .`   . \' o \\\n                  \'.\' . \' -.\\     .`   .`  .   .\\     `Y\n                    \'-.\' .   |\\  \'   ,    \'    /\'`--;;\'\n                      /\\   \'.| \'-._ /    \' _.-\'\n                      \\\'\\  \' / (`-.\'.\'  .\"/\n                       \\ )` /   .\'   .-\'./\n                        \'\\  \\).\'  .-\'--\"\n                          \'. `,_\'`\n                            `.__)\n";
 }
 
 //creates the Gorilla boss
@@ -449,8 +461,7 @@ Gorilla::Gorilla()
 	AttPower = 18;
 	DefPower = 10;
 	Experience = 700;
-	Ascii =
-			"                     ,.-\"\"\"-.,\n                    /   ===   \\\n                   /  =======  \\\n                __|  (O)   (O)  |__      \n               / _|    .---.    |_ \\         \n              | /.----/ O O \\----.\\ |       \n               \\/     |     |     \\/        \n               |                   |                      \n               |       _____       |          \n               _\\     /_____\\     /_         \n           ,.-\"  \"-.,_________,.-\"  \"-.,\n          /          |       |          \\  \n         |           \\       /           | \n         \\            |     |            /             \n       ,/ |           \\     /           | \\,     \n     ,/   \\            |   |            /   \\,    \n    /      |           |   |           |      \\  \n   /        |          |---|          |        \\\n  /\"-.,_,.-\"/\"-.,__,.-\"\\   /\"-.,__,.-\"\\\"-.,_,.-\"\\\n |         |            \\ /            |         |\n  \\__|__|_/ \\__|__|__|__/ \\__|__|__|__/ \\_|__|__/\n";
+	Ascii ="                     ,.-\"\"\"-.,\n                    /   ===   \\\n                   /  =======  \\\n                __|  (O)   (O)  |__      \n               / _|    .---.    |_ \\         \n              | /.----/ O O \\----.\\ |       \n               \\/     |     |     \\/        \n               |                   |                      \n               |       _____       |          \n               _\\     /_____\\     /_         \n           ,.-\"  \"-.,_________,.-\"  \"-.,\n          /          |       |          \\  \n         |           \\       /           | \n         \\            |     |            /             \n       ,/ |           \\     /           | \\,     \n     ,/   \\            |   |            /   \\,    \n    /      |           |   |           |      \\  \n   /        |          |---|          |        \\\n  /\"-.,_,.-\"/\"-.,__,.-\"\\   /\"-.,__,.-\"\\\"-.,_,.-\"\\\n |         |            \\ /            |         |\n  \\__|__|_/ \\__|__|__|__/ \\__|__|__|__/ \\_|__|__/\n";
 }
 
 //creates a Centaur of a random level between 9-10
@@ -464,8 +475,7 @@ Centaur::Centaur()
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
 	Experience = 10 * Level;
-	Ascii =
-			"                  ___,       /\\\n                 /,===      |  |\n              ,==( \"|\"      |  |\n             ,===\'\\_-/       \\/\n              ,---\'  \\---.   ||\n             (     - -    )  |:\n             |  \\_. \'  _./\\ ,\'/\\\n             |  )       / ,-||\\/\n   ___       ( < \\     (\\___/||\n  /   \\,----._\\ \\(   \'  )    --\n (   /         \\|\'\',, ,\'\\\n )   |          )\\   \'   |\n (  (|     ,    \\_)      |\n  )  )\\     \\-.__\\   |_, /\n  ( (  \\    )  )  ]  |  (\n   ) ) _) _/ _/   /, )) /\n   (/  \\  \\ \\      \\ |\\ |\n    )  _) \\__\\     ) | )(\n       )_,\\ )_\\    )| <_\\\n         )_\\      /_(  |_\\\n                   )_\\";
+	Ascii ="                  ___,       /\\\n                 /,===      |  |\n              ,==( \"|\"      |  |\n             ,===\'\\_-/       \\/\n              ,---\'  \\---.   ||\n             (     - -    )  |:\n             |  \\_. \'  _./\\ ,\'/\\\n             |  )       / ,-||\\/\n   ___       ( < \\     (\\___/||\n  /   \\,----._\\ \\(   \'  )    --\n (   /         \\|\'\',, ,\'\\\n )   |          )\\   \'   |\n (  (|     ,    \\_)      |\n  )  )\\     \\-.__\\   |_, /\n  ( (  \\    )  )  ]  |  (\n   ) ) _) _/ _/   /, )) /\n   (/  \\  \\ \\      \\ |\\ |\n    )  _) \\__\\     ) | )(\n       )_,\\ )_\\    )| <_\\\n         )_\\      /_(  |_\\\n                   )_\\";
 }
 
 //creates a Griffin of a random level between 11-12
@@ -479,8 +489,7 @@ Griffin::Griffin()
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
 	Experience = 10 * Level;
-	Ascii =
-			"              //           //\n             ///          ///\n            ////         ////\n            |////       /////\n            |))//;     /)))//;\n           /)))))/;   /)))))/;\n       .---`,))))/;  /)))))))/;\n   __--\\/o-  \\`))/; |)))))))/;\n  (----/    \\\\\\``;  |))))))/;\n     ~/-\\  \\\\\\\\\\``   \\))))))/;\n         \\\\\\\\\\\\\\\\`    |)))))/;\n         |\\\\\\\\\\\\\\\\___/))))))/;__-------.\n         //////|  ////))))))/;           \\___,\n        |||||||\\   \\\\|||||;:              \\_. \\\n        |\\\\\\\\\\\\\\\\\\                        |  | |\n         \\\\\\\\\\\\\\                          |  | |\n          |\\\\\\\\               __|        /   / /\n          | \\\\__\\     \\___----  |       |   / /\n          |    / |     >     \\   \\      \\  / /\n          |   /  |    /       \\   \\      >/ /  ,,\n          |   |  |   |         |   |    // /  //,\n          |   |  |   |         |   |   /| |   |\\\\,\n       _--\'   _--\'   |     _---_---\'  |  \\ \\__/\\|/\n      (-(-===(-(-(===/    (-(-=(-(-(==/   \\____/\n";
+	Ascii ="              //           //\n             ///          ///\n            ////         ////\n            |////       /////\n            |))//;     /)))//;\n           /)))))/;   /)))))/;\n       .---`,))))/;  /)))))))/;\n   __--\\/o-  \\`))/; |)))))))/;\n  (----/    \\\\\\``;  |))))))/;\n     ~/-\\  \\\\\\\\\\``   \\))))))/;\n         \\\\\\\\\\\\\\\\`    |)))))/;\n         |\\\\\\\\\\\\\\\\___/))))))/;__-------.\n         //////|  ////))))))/;           \\___,\n        |||||||\\   \\\\|||||;:              \\_. \\\n        |\\\\\\\\\\\\\\\\\\                        |  | |\n         \\\\\\\\\\\\\\                          |  | |\n          |\\\\\\\\               __|        /   / /\n          | \\\\__\\     \\___----  |       |   / /\n          |    / |     >     \\   \\      \\  / /\n          |   /  |    /       \\   \\      >/ /  ,,\n          |   |  |   |         |   |    // /  //,\n          |   |  |   |         |   |   /| |   |\\\\,\n       _--\'   _--\'   |     _---_---\'  |  \\ \\__/\\|/\n      (-(-===(-(-(===/    (-(-=(-(-(==/   \\____/\n";
 }
 
 //creates the Seminole boss
@@ -495,8 +504,7 @@ Seminole::Seminole()
 	AttPower = 25;
 	DefPower = 15;
 	Experience = 0;
-	Ascii =
-			"          / \\  \n       -..\\|/.-  \n       `-.\\|/.-\'     \n  \'.--.`\\ \\|/ /\'.--.\'\n  \\ o \' ======= \' o /\n   \\_`-=========-\'_/    ~   ~   ~\n  .--./,\'o.-.o`,\\.--.     ~   ~   ~\n \\_`- \\= (___) =/-\'_/\n  .--.`\\ -___- /\'.--.\n  \\.----\\_____/---./ \n  ~|/     FSU     \\|~\n  ~|  |=========|  |~\n  ~|  |  /)_    |  |~\n  ~|__|=/| /====|__|~\n   _||_//|/     |||_\n  (  /(/_______/ _  \\\n   \\\\\\;;;;;;;;;\\) )))\n   // |-   _   -|\n      |___/ \\___|\n     (___)   (___)\n";
+	Ascii ="          / \\  \n       -..\\|/.-  \n       `-.\\|/.-\'     \n  \'.--.`\\ \\|/ /\'.--.\'\n  \\ o \' ======= \' o /\n   \\_`-=========-\'_/    ~   ~   ~\n  .--./,\'o.-.o`,\\.--.     ~   ~   ~\n \\_`- \\= (___) =/-\'_/\n  .--.`\\ -___- /\'.--.\n  \\.----\\_____/---./ \n  ~|/     FSU     \\|~\n  ~|  |=========|  |~\n  ~|  |  /)_    |  |~\n  ~|__|=/| /====|__|~\n   _||_//|/     |||_\n  (  /(/_______/ _  \\\n   \\\\\\;;;;;;;;;\\) )))\n   // |-   _   -|\n      |___/ \\___|\n     (___)   (___)\n";
 }
 
 //used to heal Seminole whenever health hits zero
@@ -511,8 +519,6 @@ void Seminole::DrinkHaterade()
 }
 
 //**xLocations and yLocations need int values based on maps**//
-//**Randomization needs to be checked**//
-//**Enemy AttPower/Defense might need to be adjusted & Attack method isn't quite working**//
 
 //example combat loop
 int main()
@@ -523,8 +529,8 @@ int main()
 	string eAttack;
 	int n;
 
-	p.PrintCombatStats();
-	e.PrintEnemyStats();
+	cout << p.PrintCombatStats();
+	cout << e.PrintEnemyStats();
 	e.PrintAscii();
 	cout << "1. Attack  2. Eat  3. Flee" << endl;
 
@@ -585,8 +591,8 @@ int main()
 			return true;
 		}
 
-		p.PrintCombatStats();
-		e.PrintEnemyStats();
+		cout << p.PrintCombatStats();
+		cout << e.PrintEnemyStats();
 		e.PrintAscii();
 		cout << "1. Attack  2. Eat  3. Flee" << endl;
 
