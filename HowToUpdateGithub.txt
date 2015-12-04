@@ -1,0 +1,27 @@
+How to add files on Github
+==========================================
+Because Git Pull doesn't always work we're going to completely delete and reclone your directory so that other
+people's files aren't overwritten except when they're supposed to be. 
+
+1 - Copy whatever files you have modified or plan to add into a serperate directory
+2 - Delete the COP3503 directory
+3 - Open the Git Shell app if you're on windows or if you're on Linux/unix just open a terminal
+4 - Now we're going to clone the directory, giving you the updated versions of all the files. While in the directory you want 
+the project to be located type "git clone https://github.com/kylegwalsh/COP3503-Project"
+5- Now add whatever files you want to the COP3503-Project directory.
+6- type "git status" This will tell you which files have been modified
+7- If you need to remove a file (and not replace it with an updated version) for some reason type "rm filename"
+8- Now that your files are as they should be in the directory type "git add ." which will add all your files, basically telling github that these are intentionally modified.
+9-Now we must commit the changes. type (git commit -m "tell us what you changed here. yes the message is mandatory" )
+10 - Now you will push the changes you made into the master branch. type "git push origin master"
+11- If it tells you it doesnt know who you are or you're not logged in simply follow the error instructions that pop up and try again.
+=================================
+
+
+How to Transfer files and test them on the school server.
+1- Open the terminal
+2- type scp filenamefortransfer yourciseusername@thunder.cise.ufl.edu:~/directoryyouwantthefilein
+3-enter your password
+4-log in to the server type ssh yourciseusername@thunder.cise.ufl.edu
+5-enter your password
+6- navigate to the appropriate directory and do the usual g++ -std=c++11 filename
