@@ -77,8 +77,8 @@ public:
 //a subclass holding enemy's data
 class Enemy: public Character{
 protected:
-	string Ascii;
 	bool Boss;
+	vector<string> asciivector;
 
 public:
 	int RandomizeLevel(int low, int high);
