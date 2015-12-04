@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-//#include <curses.h>
+//#include <conio.h>
 #include <ctime>
 #include "screen.h"
 #include "character.h"
@@ -16,9 +16,9 @@ class Game
 		Player al;
 	public:
 		Game();
-		bool combat(Enemy enemy);
+		bool combat(Player al, Enemy enemy);
 		void playLevel();
 		void printMap();
 		void update();
 		void gameOver();
-}
+};
