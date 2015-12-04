@@ -66,6 +66,8 @@ void Map::initializeAllowableArea()
 	}
 }
 
+void Map::
+
 void Map::loadNext()
 {
 	level++;

@@ -1,24 +1,9 @@
 #include "MapCreator.h"
 
-int main()
-{
-	MapCreator mc();
-	for (int i=0; i<3; i++)
-	{
-		mc.createNewLevel();
-		mc.addLevel();
-	}
-	return 0;
-}
-
+//CONSTRUCTOR
 MapCreator::MapCreator()
 {
 	mapLevel = 1;
-}
-
-MapCreator::MapCreator(int level)
-{
-	mapLevel = level;
 }
 
 void MapCreator::createNewLevel()

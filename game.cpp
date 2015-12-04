@@ -1,11 +1,14 @@
 #include "game.h"
 
-void Game()
+Game::Game()
 {
 	ResizeScrn();
 	StartScrn();
 	
-	bool playing=true;
+	playing=true;
+
+	map = Map();
+	setPadding();
 	
 	while(playing)
 	{	
@@ -15,6 +18,11 @@ void Game()
 		//else level++
 	}
 };
+
+Game::setHorizontalPadding()
+{
+	horizontalPadding = (70-map.getColumns())/2;
+}
 
 bool Game::combat(Player al, Enemy enemy)
 {
@@ -56,10 +64,6 @@ void Game::playLevel()
 		case 3:
 			Level3IntroScrn();
 	}
-	
-	map = Map();
-	std::vector< std::vector<std::string> > mapData = map.getMapData();
-	std::vector< std::vector<int> > allow = map.getAllowableArea();
 	
 	//place character?
 	
@@ -159,6 +163,10 @@ void Game::playLevel()
 				 {
 					 bossBeaten = combat(al, *bosses[level-1]);
 					 alive = bossBeaten;
+					 if (bossBeaten)
+					 {
+					 	loadNextLevel();
+					 }
 				 }
 				 else message="You must find the key before you can battle the boss!";
 			 }
@@ -186,7 +194,36 @@ void Game::playLevel()
 	}
 };
 
-void Game::printMap() {};
+void Game::loadNextLevel()
+{
+	level++;
+	map.loadNext();
+	mapData = map.getMapData();
+	allow = map.getAllowableArea();
+	setHorizontalPadding();
+}
+
+void Game::printMap() 
+{
+	for (int i=0; i<rows; i++)
+	{
+		for (int p=0; p<horizontalPad; p++)
+		{
+			std::cout << " ";
+		}
+		for (int j=0; j<columns; j++)
+		{
+			if (allow[i][j])
+			{
+				std::cout << mapData[i][j] << " ";
+			}
+			else
+			{
+				std::cout << "X" << " ";
+			}
+		}
+	}
+}
 
 void Game::update()
 {
