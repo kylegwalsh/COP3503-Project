@@ -9,7 +9,7 @@ people's files aren't overwritten except when they're supposed to be.
 4 - Now we're going to clone the directory, giving you the updated versions of all the files. While in the directory you want 
 the project to be located type "git clone https://github.com/kylegwalsh/COP3503-Project"
 5- Now add whatever files you want to the COP3503-Project directory.
-6- type "git status" This will tell you which files have been modified
+6- type"cd ./COP*" then "git status" This will tell you which files have been modified
 7- If you need to remove a file (and not replace it with an updated version) for some reason type "rm filename"
 8- Now that your files are as they should be in the directory type "git add ." which will add all your files, basically telling github that these are intentionally modified.
 9-Now we must commit the changes. type (git commit -m "tell us what you changed here. yes the message is mandatory" )
