@@ -46,6 +46,7 @@ private:
 	int LevelUpEXP;
 	int xLocation;
 	int yLocation;
+	vector<int> SavedStats;
 
 public:
 	Player();
@@ -57,8 +58,7 @@ public:
 	void MoveLeft();
 	void MoveUp();
 	void MoveDown();
-	void MoveToSecondMap();
-	void MoveToThirdMap();
+	void SetLocation(int x, int y);
 	void GainExperience(Character c);
 	void FindFood();
 	void FindGatorade();
@@ -68,9 +68,10 @@ public:
 	int GetStamina();
 	int GetxLocation();
 	int GetyLocation();
-	void PrintMapStats();
-	void PrintCombatStats();
-	vector<int> const &GetSaveStats() const;
+	string PrintMapStats();
+	string PrintCombatStats();
+	void SaveStats();
+	void RevertStats();
 };
 
 //a subclass holding enemy's data
@@ -81,7 +82,7 @@ protected:
 
 public:
 	int RandomizeLevel(int low, int high);
-	void PrintEnemyStats();
+	string PrintEnemyStats();
 	void PrintAscii();
 };
 
