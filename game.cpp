@@ -283,30 +283,33 @@ void Game::loadNextLevel()
 	setHorizontalPadding();
 }
 
-void Game::printMap() //changed to include border because pretty
+void Game::printMap(int playerX, int playerY) //changed to include border because pretty
 {
-	//is this where we should place the player or is that handled somewhere else?
+	
 	for (int i=0; i<rows; i++)
 	{
-		std::cout << "|";
-		
+		for (int p=0; p<horizontalPad; p++)
+		{
+			std::cout << " ";
+		}
 		for (int j=0; j<columns; j++)
 		{
 			if (allow[i][j])
 			{
-				std::cout << mapData[i][j] << " ";
+				if (i==playerY && j==playerX)
+				{
+					std::cout << "@" << " ";
+				}
+				else 
+				{
+					std::cout << mapData[i][j] << " ";
+				}
 			}
 			else
 			{
 				std::cout << "X" << " ";
 			}
 		}
-		for (int p=1; p<horizontalPadding; p++)
-		{
-			std::cout << " ";
-		}
-		
-		std::cout << "|\n";
 	}
 }
 
