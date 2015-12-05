@@ -4,19 +4,20 @@ Game::Game()
 {
 	ResizeScrn();
 	StartScrn();
-	
-	playing=true;
-
 	map = Map();
 	setHorizontalPadding();
-	
-	while(playing)
-	{	
-		playLevel();
-	}
 };
 
-Game::setHorizontalPadding()
+void Game::start()
+{
+	playing = true;
+	while (playing)
+	{
+		playLevel();
+	}
+}
+
+void Game::setHorizontalPadding()
 {
 	horizontalPadding = (70-map.getColumns())/2;
 }
