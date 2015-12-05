@@ -88,7 +88,7 @@ void MapCreator::addEnvironment()
 	std::string symbols[] = {"G", "H", "M", "T"}; //each object's symbol notation with aligned index
 	int tempX, tempY; //changing x-y values for insertion
 	srand(time(0)); //seeding the random number generator
-	for (int i=0; i<(sizeof(objectsToInsert)/sizeof(int)); i++) //for each in objectsToInsert
+	for (int i=0; i<((sizeof(objectsToInsert)/sizeof(int)); i++) //for each in objectsToInsert
 	{
 		while (objectsToInsert[i]>0) //while that index still has more to place
 		{
