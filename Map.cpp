@@ -1,11 +1,15 @@
 #include "Map.h"
 
+//CONSTRUCTOR
 Map::Map()
 {
 	level = 1;
  	importMap();
 }
 
+/*
+* Imports the map for the current level into Map's member data
+*/
 void Map::importMap()
 {
 	fileName = "maplevel";
@@ -14,6 +18,10 @@ void Map::importMap()
 	initializeAllowableArea();
 }
 
+/*
+* File Input reads map from already saved text file
+* Also reads in the columns and rows of the map
+*/
 void Map::readMapData()
 {
 	std::ifstream readFile(fileName, std::ios::in);
@@ -53,6 +61,10 @@ void Map::readMapData()
 	}
 }
 
+/*
+* Initializes the int representeted boolean vector with all ones
+* All of the map is allowable at the beginning of the level
+*/
 void Map::initializeAllowableArea()
 {
 	for (int i=0; i<rows; i++)
@@ -66,32 +78,54 @@ void Map::initializeAllowableArea()
 	}
 }
 
+/*
+* Resets the allowable area to be all true again
+* Used during a game over scenario
+*/
 void Map::reset()
 {
 	initializeAllowableArea();
 }
 
+/*
+* Loads the next map into member data
+* Clears previous data
+*/
 void Map::loadNext()
 {
+	mapData.clear();
+	boolAllowableArea.clear();
 	level++;
 	importMap();
 }
 
+/*
+* returns the amount of columns
+*/
 int Map::getColumns()
 {
 	return columns;
 }
 
+/*
+* returns the amount of rows
+*/
 int Map::getRows()
 {
 	return rows;
 }
 
+/*
+* returns a read only const pointer version of the mapData
+*/
 std::vector< std::vector<std::string> > const &Map::getMapData() const
 {
 	return mapData;
 }
 
+/*
+* returns a read only const pointer version of the allowable area
+*/
 std::vector< std::vector<int> > const &Map::getAllowableArea() const
 {
 	return boolAllowableArea;

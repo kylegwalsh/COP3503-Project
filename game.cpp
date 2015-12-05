@@ -180,6 +180,7 @@ void Game::playLevel()
 						message = "You found some food!";
 					}
 				 }
+				 allow[y][x] = 0;
 			}
 			//tower
 			else if (place.compare("T") == 0)
@@ -201,11 +202,13 @@ void Game::playLevel()
 					al.FindFood();
 					message = "You found some food!";
 				}
+				allow[y][x] = 0;
 			 }
 			 else if(place.compare("G") == 0)
 			 {
 				 al.FindGatorade();
 				 message = "You found a Gatorade machine! Your Gatorade has increased!";
+				 allow[y][x] = 0;
 			}
 			//barracks
 			else if (place.compare("M") == 0)
@@ -214,6 +217,7 @@ void Game::playLevel()
 				 int toAdd = al.GetMaxHealth()-al.GetHealth();
 				 al.ChangeHealth(toAdd);
 				 message = "You took a rest in the Barracks. Health is now full!";
+				 allow[y][x] = 0;
 			}
 			//level boss
 			else if (place.compare("B") == 0)
@@ -235,7 +239,11 @@ void Game::playLevel()
 						}
 					 }
 				 }
-				 else message="You must find the key before you can battle the boss!";
+				 else 
+				 {
+				 	message="You must find the key before you can battle the boss!";
+				 }
+				 allow[y][x] = 0;
 			}
 			else //if place=/
 			{
@@ -294,7 +302,7 @@ void Game::printMap(int playerX, int playerY) //changed to include border becaus
 		}
 		for (int j=0; j<columns; j++)
 		{
-			if (allow[i][j])
+			if (allow[i][j]==1)
 			{
 				if (i==playerY && j==playerX)
 				{
