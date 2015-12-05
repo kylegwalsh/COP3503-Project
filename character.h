@@ -14,6 +14,7 @@
 #include <random>
 #include <vector>
 #include <limits>
+#include <conio.h>
 using namespace std;
 
 //the overall character object
@@ -63,9 +64,10 @@ public:
 	void MoveUp();
 	void MoveDown();
 	void SetLocation(int x, int y);
-	void GainExperience(Character c);
+	void GainExperience(Character *c);
 	void FindFood();
 	void FindGatorade();
+	void Sleep();
 	int GetFood();
 	int GetGatorade();
 	int GetMaxStamina();
@@ -145,6 +147,7 @@ int Haterade;
 
 public:
 	Seminole();
+	int GetHaterade();
 	void DrinkHaterade();
 };
 
