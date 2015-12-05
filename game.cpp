@@ -160,7 +160,7 @@ void Game::playLevel()
 				 }
 				 if (random>80 && <=90)
 				 {
-				 	message = "You found a nice comfy little to sit your butt on! Gained health && stamina!"
+				 	message = "You found a nice comfy little bed to sit your butt on! Gained health && stamina!"
 				 	al.sleep();
 				 }
 				 if (random>90)
