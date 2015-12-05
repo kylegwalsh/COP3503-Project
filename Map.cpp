@@ -66,7 +66,10 @@ void Map::initializeAllowableArea()
 	}
 }
 
-void Map::
+void Map::resetAllowableArea()
+{
+	initializeAllowableArea();
+}
 
 void Map::loadNext()
 {

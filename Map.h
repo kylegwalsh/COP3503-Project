@@ -25,6 +25,7 @@ public:
 	int getColumns();
 	int getRows();
 	void loadNext();
+	void resetAllowableArea();
 	std::vector< std::vector<std::string> > const &getMapData() const;
 	std::vector< std::vector<int> > const &getAllowableArea() const;
 };
