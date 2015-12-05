@@ -314,6 +314,49 @@ void GameOverScrn(){
 			//quit option which ends the program
 			if(input==2)
 			{
+				QuitScrn();
+				input=0;
+			}
+		}
+}
+
+void QuitScrn(){
+
+		for(int i=-2; i<28; i++){
+			if(i==-2||i==27){
+				cout << "|================================================================================|";
+				if(i==-2){
+					cout << endl;
+				}
+			}
+			if(i==10){
+				cout << "|                                  Quit Screen!                                  |\n";
+			}
+			if(i==12){
+				cout << "|                                 Are you sure?                                  |\n";
+			}
+			if(i==13){
+				cout << "|                                (1.Yes / 2. No)                                 |\n";
+			}
+			if((i>-2&&i<10)||i==11||(i>14&&i<27)){
+				cout << "|                                                                                |\n";
+			}
+		}
+		int input;
+		input = 0;
+
+		while(input!=1&&input!=2)
+		{
+			input=getch()-'0';
+
+			//continue option which reverts stats and map to what they were at the start of the level
+			if(input==1)
+			{
+				break;
+			}
+			//quit option which ends the program
+			if(input==2)
+			{
 				exit(1);
 			}
 		}

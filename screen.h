@@ -25,6 +25,6 @@ void BeatGameScrn();
 void ClearScrn();
 void LevelUpScrn();
 void GameOverScrn();
-
+void QuitScrn();
 
 #endif /* SCREEN_H_ */
