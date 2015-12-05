@@ -8,14 +8,11 @@ Game::Game()
 	playing=true;
 
 	map = Map();
-	setPadding();
+	setHorizontalPadding();
 	
 	while(playing)
 	{	
 		playLevel();
-		
-		//if quit, break
-		//else level++
 	}
 };
 
@@ -33,6 +30,7 @@ void Game::playLevel()
 {
 	//~ random_device rd;
 	//~ mt19937 gen(rd());
+	al.SaveStats();
 	
 	char dir;
 	int x, y;
@@ -65,13 +63,21 @@ void Game::playLevel()
 			Level3IntroScrn();
 	}
 	
-	//place character?
+	mapData = map.getMapData();
+	
+	//place character: bottom middle
+	x = map.getColumns()/2;
+	y = map.getRows();
+	
+	al.SetLocation(x, y);
 	
 	update();
 	
 	while(!bossBeaten)
 	{
 		moved = false;
+		
+		allow = map.getAllowableArea();
 		
 		x = al.GetxLocation();
 		y = al.GetyLocation();
@@ -122,7 +128,19 @@ void Game::playLevel()
 				}
 				break;
 			case 'q':
-				//quit screen
+				//quit triggers game over screen for now,
+				//can be changed if another similar method is created
+				if (GameOverScrn()) //user chose to continue, starts level over
+				{
+					al.RevertStats();
+					//reset level map
+					keyFound = false;
+				}
+				else //user chose not to continue
+				{
+					playing = false;
+					return;
+				}
 				break;
 			default:
 				message = "Invalid key pressed!";
@@ -137,45 +155,94 @@ void Game::playLevel()
 			 
 			 place = mapData[y][x];
 			 
+			 //house
 			 if (place.compare("H") == 0)
 			 {
-				 //find key, food, or monster?
-			 }
-			 else if (place.compare("T") == 0)
-			 {
+				 //find key, food, or monster
+				 //if key is here
+				 //	keyFound = true;
+				 //else
+				 {
+					if (rand()%2 == 0)
+					{
+						if (rand()%2 == 0)
+						{
+							alive = combat(al, *type1[level-1]);
+						}
+						else
+						{
+							alive = combat(al, *type2[level-1]);
+						}
+					}
+					else
+					{
+						al.FindFood();
+						message = "You found some food!";
+					}
+				 }
+			}
+			//tower
+			else if (place.compare("T") == 0)
+			{
 				 //find food or monster
+				if (rand()%2 == 0)
+				{
+					if (rand()%2 == 0)
+					{
+						alive = combat(al, *type1[level-1]);
+					}
+					else
+					{
+						alive = combat(al, *type2[level-1]);
+					}
+				}
+				else
+				{
+					al.FindFood();
+					message = "You found some food!";
+				}
 			 }
 			 else if(place.compare("G") == 0)
 			 {
 				 al.FindGatorade();
 				 message = "You found a Gatorade machine! Your Gatorade has increased!";
-			 }
-			 else if (place.compare("M") == 0)
-			 {
-				 //sleep; recovers hp
+			}
+			//barracks
+			else if (place.compare("M") == 0)
+			{
+				 //sleep; recovers health
 				 int toAdd = al.GetMaxHealth()-al.GetHealth();
 				 al.ChangeHealth(toAdd);
 				 message = "You took a rest in the Barracks. Health is now full!";
-			 }
-			 else if (place.compare("B") == 0)
-			 {
+			}
+			//level boss
+			else if (place.compare("B") == 0)
+			{
 				 if (keyFound) 
 				 {
 					 bossBeaten = combat(al, *bosses[level-1]);
 					 alive = bossBeaten;
 					 if (bossBeaten)
 					 {
-					 	loadNextLevel();
+						if (level==3)
+						{
+							BeatGameScrn();
+							playing = false;
+						}
+						else
+						{
+							loadNextLevel();
+						}
 					 }
 				 }
 				 else message="You must find the key before you can battle the boss!";
-			 }
-			 else //if place=/
-			 {
-				 srand(time(0)); //might not need this line?
+			}
+			else //if place=/
+			{
+				 srand(time(0)); //Do I need this line?
 				 if (rand()%10 == 0) //10% chance of finding an enemy
 				 {
-					 //chooses randomly bat or scorpion
+					 //chooses randomly type 1 or type 2 enemy for level
 					 if (rand()%2 == 0)
 					 {
 						 alive = combat(al, *type1[level-1]);
@@ -185,10 +252,23 @@ void Game::playLevel()
 						 alive = combat(al, *type2[level-1]);
 					 }
 				 }
-			 }
-			 //check stats
-			 if (al.GetHealth()<=0 || !alive)
-				GameOverScrn();
+			}
+		}
+		
+		//check stats
+		if (al.GetHealth()<=0 || !alive)
+		{
+			if (GameOverScrn()) //user chose to continue, starts level over
+			{
+				al.RevertStats();
+				//reset level map
+				keyFound = false;
+			}
+			else //user chose not to continue
+			{
+				playing = false;
+				break;
+			}
 		}
 		update();
 	}
@@ -203,14 +283,13 @@ void Game::loadNextLevel()
 	setHorizontalPadding();
 }
 
-void Game::printMap() 
+void Game::printMap() //changed to include border because pretty
 {
+	//is this where we should place the player or is that handled somewhere else?
 	for (int i=0; i<rows; i++)
 	{
-		for (int p=0; p<horizontalPad; p++)
-		{
-			std::cout << " ";
-		}
+		std::cout << "|";
+		
 		for (int j=0; j<columns; j++)
 		{
 			if (allow[i][j])
@@ -222,22 +301,28 @@ void Game::printMap()
 				std::cout << "X" << " ";
 			}
 		}
+		for (int p=1; p<horizontalPadding; p++)
+		{
+			std::cout << " ";
+		}
+		
+		std::cout << "|\n";
 	}
 }
 
 void Game::update()
 {
-	int spaces = (20-map.getRows())/2;
+	int verticalPadding = (20-map.getRows())/2;
 	//prints screen
 	cout<<" ======================================================================= \n";
 	cout<<"| "<<al.PrintMapStats()<<std::string(69-(al.PrintMapStats().size()), ' ')<<"|\n";
 	cout<<"|-----------------------------------------------------------------------|\n";
-	for (int i=0; i<spaces; i++)
+	for (int i=0; i<verticalPadding; i++)
 	{
 		cout<<"|                                                                       |\n";
 	}
 	printMap();
-	for (int i=0; i<spaces; i++)
+	for (int i=0; i<verticalPadding; i++)
 	{
 		cout<<"|                                                                       |\n";
 	}
