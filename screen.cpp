@@ -9,6 +9,7 @@
 
 //prints the outline of max screen for the player to resize their console
 void ResizeScrn(){
+	ClearScrn();
 	for(int i=0; i<31; i++){
 		if(i==0||i==29){
 			cout << "|================================================================================|";
@@ -71,6 +72,7 @@ void StartScrn(){
 
 //prints the level one intro screen
 void Level1IntroScrn(){
+	ClearScrn();
 	for(int i=-2; i<28; i++){
 		if(i==-2||i==27){
 			cout << "|================================================================================|";
@@ -121,6 +123,7 @@ void Level1IntroScrn(){
 
 //prints the level 2 intro screen
 void Level2IntroScrn(){
+	ClearScrn();
 	for(int i=-2; i<28; i++){
 		if(i==-2||i==27){
 			cout << "|================================================================================|";
@@ -163,6 +166,7 @@ void Level2IntroScrn(){
 
 //prints the level 3 intro screen
 void Level3IntroScrn(){
+	ClearScrn();
 	for(int i=-2; i<28; i++){
 			if(i==-2||i==27){
 				cout << "|================================================================================|";
@@ -205,6 +209,7 @@ void Level3IntroScrn(){
 
 //prints the beat the game screen
 void BeatGameScrn(){
+	ClearScrn();
 	for(int i=-2; i<28; i++){
 			if(i==-2||i==27){
 				cout << "|================================================================================|";
@@ -247,6 +252,7 @@ void ClearScrn(){
 
 //prints the level up screen
 void LevelUpScrn(){
+	ClearScrn();
 	for(int i=-2; i<28; i++){
 		if(i==-2||i==27){
 			cout << "|================================================================================|";
@@ -273,7 +279,7 @@ void LevelUpScrn(){
 
 //prints the game over screen
 void GameOverScrn(){
-
+	ClearScrn();
 		for(int i=-2; i<28; i++){
 			if(i==-2||i==27){
 				cout << "|================================================================================|";
@@ -321,7 +327,7 @@ void GameOverScrn(){
 }
 
 void QuitScrn(){
-
+	ClearScrn();
 		for(int i=-2; i<28; i++){
 			if(i==-2||i==27){
 				cout << "|================================================================================|";
