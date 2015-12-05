@@ -55,18 +55,16 @@ void MapCreator::assignAreaAmounts()
 	gatoradeMachines = 2;
 	houseNum = 3;
 	barracksNum = 0;
-	towerNum = 0;
+	towerNum = 1;
 	switch (mapLevel)
 	{
-		case 2: gatoradeMachines = 2;
+		case 2: gatoradeMachines = 5;
 				houseNum = 4;
 				barracksNum = 0;
-				towerNum = 2;
 				break;
 		case 3: gatoradeMachines = 6;
-				houseNum = 6;
+				houseNum = 7;
 				barracksNum = 5;
-				towerNum = 7;
 				break;
 	}
 	if (mapLevel>3)
@@ -74,7 +72,6 @@ void MapCreator::assignAreaAmounts()
 		gatoradeMachines = 2;
 		houseNum = 1;
 		barracksNum = 0;
-		towerNum = 0;
 	}
 }
 
