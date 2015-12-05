@@ -1,6 +1,11 @@
 #include "game.h" 
 #include "MapCreator.h"
 
+/*
+* Main method 
+* Creates new maps for the game
+* Instantiates game and starts
+*/
 int main()
 {
 	MapCreator mC = MapCreator();

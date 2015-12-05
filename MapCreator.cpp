@@ -6,6 +6,7 @@ MapCreator::MapCreator()
 	mapLevel = 1;
 }
 
+//creates a new map for the level
 void MapCreator::createNewLevel()
 {
 	assignHeightWidth();
@@ -15,11 +16,16 @@ void MapCreator::createNewLevel()
 	save();
 }
 
+//Increments the level
 void MapCreator::addLevel()
 {
 	mapLevel+=1;
 }
 
+/*
+* Assigns the height and width 
+* AKA the rows and columns for the map
+*/
 void MapCreator::assignHeightWidth()
 {
 	columns = (30/2);
@@ -41,6 +47,9 @@ void MapCreator::assignHeightWidth()
 	}
 }
 
+/*
+* Based on level sets vars to proper number
+*/
 void MapCreator::assignAreaAmounts()
 {
 	gatoradeMachines = 2;
@@ -122,6 +131,11 @@ bool MapCreator::isIsolated(int c, int r)
 		(map[((r+1)*columns)+(c-1)].compare("\\")==0 && map[((r+1)*columns)+(c+1)].compare("\\")==0)); //bottom diagonals
 }
 
+/*
+* Saves the columnns and rows as well as map data to a file named: maplevel+(the current level)
+* Rows are flagged by a '#' columns are flagged by a "$"
+* Map is saved in formatted matrix form
+*/
 void MapCreator::save()
 {
 	std::string outFileName = "maplevel";

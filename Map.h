@@ -9,12 +9,12 @@
 class Map 
 {
 private:
-	std::vector< std::vector<std::string> >  mapData; 
+	std::vector< std::vector<std::string> >  mapData; //represents the map
 	std::vector< std::vector<int>  > boolAllowableArea; //1 - true, 0-false
 	int columns; //x
 	int rows; //y
-	std::string fileName;
-	int level;
+	std::string fileName; //the file that the map is being read from
+	int level; //current level
 
 	void readMapData();
 	void initializeAllowableArea();
