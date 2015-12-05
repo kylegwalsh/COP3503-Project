@@ -60,7 +60,7 @@ void MapCreator::assignAreaAmounts()
 	{
 		case 2: gatoradeMachines = 5;
 				houseNum = 4;
-				barracksNum = 0;
+				barracksNum = 3;
 				break;
 		case 3: gatoradeMachines = 6;
 				houseNum = 7;
