@@ -202,11 +202,43 @@ void Game::playLevel()
 			//barracks
 			else if (place.compare("M") == 0)
 			{
-				 //sleep; recovers health
-				 int toAdd = al.GetMaxHealth()-al.GetHealth();
-				 al.ChangeHealth(toAdd);
-				 message = "You took a rest in the Barracks. Health is now full!";
-				 allow[y][x] = 0;
+				if (random<=10)
+				{
+					message = "You stepped on a landmine";
+					al.ChangeHealth(-25);
+				}
+				if (random>10 && random<=20)
+				{
+					message = "You found some good eats";
+					al.FindFood();
+					al.FindFood();
+				}
+				if (random>20 && random<=50)
+				{
+					alive = combat(al, *type2[level-1]);
+					alive = combat(al, *type2[level-1]);
+				}
+				if (random>50 && random<=65)
+				{
+					alive = combat(al, *type1[level-1]);
+					alive = combat(al, *type2[level-1]);
+				}
+				if (random>65 && random<=75)
+				{
+					message = "You got caught in a booby trap, and got a little banged up";
+					al.ChangeHealth(-15);
+				}
+				if (random>75 && random<=97)
+				{
+					message = "You found one of Alberta's scales! Now you're motivated";
+					al.ChangeStamina(10);
+				}
+				if (random>97)
+				{
+					alive = combat(al, *type2[level-1]);
+					alive = combat(al, *type1[level-1]);
+					alive = combat(al, *type2[level-1]);
+				}
 			}
 			//level boss
 			else if (place.compare("B") == 0)
