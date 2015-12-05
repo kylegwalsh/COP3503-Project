@@ -132,19 +132,7 @@ void Game::playLevel()
 				}
 				break;
 			case 'q':
-				//quit triggers game over screen for now,
-				//can be changed if another similar method is created
-				if (GameOverScrn()) //user chose to continue, starts level over
-				{
-					al.RevertStats();
-					//reset level map
-					keyFound = false;
-				}
-				else //user chose not to continue
-				{
-					playing = false;
-					return;
-				}
+				QuitScrn();
 				break;
 			default:
 				message = "Invalid key pressed!";
