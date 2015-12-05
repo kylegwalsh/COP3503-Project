@@ -2,10 +2,10 @@
 #define MAP_CREATOR_H
 
 
-#include <iostream>
 
 #include <fstream>
 #include <vector>
+#include <iostream>
 #include <string>
 #include <cstdlib>
 #include <ctime>
@@ -29,7 +29,6 @@ private:
 	void addEnvironment();
 	void save();
 	bool isIsolated(int c, int r);
-	void printMap();
 
 public:
 	MapCreator();

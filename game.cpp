@@ -29,8 +29,6 @@ bool Game::combat(Player al, Enemy enemy)
 
 void Game::playLevel()
 {
-	//~ random_device rd;
-	//~ mt19937 gen(rd());
 	al.SaveStats();
 	
 	char dir;
@@ -74,8 +72,13 @@ void Game::playLevel()
 	
 	update();
 	
+	uniform_int_distribution<mt19337::result_type> dist(1,100);
+	int random;
+
 	while(!bossBeaten)
 	{
+		random = dist(al.gen);
+
 		moved = false;
 		
 		allow = map.getAllowableArea();
@@ -159,54 +162,39 @@ void Game::playLevel()
 			 //house
 			 if (place.compare("H") == 0)
 			 {
-				 //find key, food, or monster
-				 //if key is here
-				 //	keyFound = true;
-				 //else
+				 if (random<=40)
 				 {
-					if (rand()%2 == 0)
-					{
-						if (rand()%2 == 0)
-						{
-							alive = combat(al, *type1[level-1]);
-						}
-						else
-						{
-							alive = combat(al, *type2[level-1]);
-						}
-					}
-					else
-					{
-						al.FindFood();
-						message = "You found some food!";
-					}
+				 	al.FindFood();
+				 }
+				 if (random>40 && <=80)
+				 {
+				 	alive = combat(al, *type1[level-1]);
+				 }
+				 if (random>80 && <=90)
+				 {
+				 	message = "You found a nice comfy little to sit your butt on! Gained health && stamina!"
+				 	al.sleep();
+				 }
+				 if (random>90)
+				 {
+				 	message = "You stubbed your toe! You lost 5 health!";
+				 	al.ChangeHealth(-5);
 				 }
 				 allow[y][x] = 0;
 			}
 			//tower
 			else if (place.compare("T") == 0)
 			{
-				 //find food or monster
-				if (rand()%2 == 0)
+				alive = combat(al, *type1[level-1]);
+				alive = combat(al, *type2[level-1]);
+				if (alive)
 				{
-					if (rand()%2 == 0)
-					{
-						alive = combat(al, *type1[level-1]);
-					}
-					else
-					{
-						alive = combat(al, *type2[level-1]);
-					}
-				}
-				else
-				{
-					al.FindFood();
-					message = "You found some food!";
+					keyFound = true;
 				}
 				allow[y][x] = 0;
 			 }
-			 else if(place.compare("G") == 0)
-			 {
+			else if(place.compare("G") == 0)
+			{
 				 al.FindGatorade();
 				 message = "You found a Gatorade machine! Your Gatorade has increased!";
 				 allow[y][x] = 0;
@@ -225,7 +213,7 @@ void Game::playLevel()
 			{
 				 if (keyFound) 
 				 {
-					 bossBeaten = combat(al, *bosses[level-1]);
+					 bossBeaten = combat(&al, *bosses[level-1]);
 					 alive = bossBeaten;
 					 if (bossBeaten)
 					 {
@@ -244,21 +232,20 @@ void Game::playLevel()
 				 {
 				 	message="You must find the key before you can battle the boss!";
 				 }
-				 allow[y][x] = 0;
 			}
 			else //if place=/
 			{
-				 srand(time(0)); //Do I need this line?
-				 if (rand()%10 == 0) //10% chance of finding an enemy
+				 if (random<=10)
 				 {
 					 //chooses randomly type 1 or type 2 enemy for level
-					 if (rand()%2 == 0)
+				 	 random = dist(al.gen)
+					 if (random<=62)
 					 {
-						 alive = combat(al, *type1[level-1]);
+						 alive = combat(&al, *type1[level-1]);
 					 }
 					 else
 					 {
-						 alive = combat(al, *type2[level-1]);
+						 alive = combat(&al, *type2[level-1]);
 					 }
 				 }
 			}
@@ -333,7 +320,7 @@ void Game::update()
 	{
 		cout<<"|                                                                       |\n";
 	}
-	printMap();
+	place\
 	for (int i=0; i<verticalPadding; i++)
 	{
 		cout<<"|                                                                       |\n";
