@@ -7,6 +7,12 @@
 
 #include "character.h"
 
+//initializes each character with a random number seed
+Character::Character()
+{
+	gen.seed(random_device()());
+}
+
 //returns the character's experience
 int Character::GetExperience()
 {
@@ -60,49 +66,97 @@ void Character::ChangeHealth(int h)
 //determines how much damage an attack does and whether it misses
 string Character::Attack(Character *c)
 {
-	random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<> dis(1, 10);
-	int random = dis(gen);
+	uniform_int_distribution<mt19937::result_type> dist(1,10);
+	int random = dist(gen);
 	int damage;
+	stringstream convert;
+	string dam;
 	string s;
 
-	//attack misses
-	if (random == 1)
+	//attack possibilities for Albert
+	if(Name=="Albert")
 	{
-		damage = 0;
-		s = Name + " missed!";
+		//attack misses
+		if (random == 1)
+		{
+			damage = 0;
+			s = Name + " missed!";
+		}
+		//critical hit
+		if (random == 10)
+		{
+			if ((AttPower - c->GetDefPower()) <= 0)
+			{
+				damage = 2;
+			}
+			else
+			{
+				damage = 2 * (AttPower - c->GetDefPower());
+			}
+			convert << damage;
+			dam=convert.str();
+			s = "It's a critical hit! " + Name + " did " + dam + " damage.";
+		}
+		//normal attack
+		if (random!=1&&random!=10)
+		{
+			if ((AttPower - c->GetDefPower()) <= 0)
+			{
+				damage = 1;
+			}
+			else
+			{
+				damage = 1 * (AttPower - c->GetDefPower());
+			}
+			convert << damage;
+			dam=convert.str();
+			s = Name + " did " + dam + " damage.";
+		}
 	}
-	//critical hit
-	if (random == 10)
+	//attack possibilities for enemies
+	else
 	{
-		if ((AttPower - c->GetDefPower()) <= 0)
+		//attack misses
+		if (random == 7)
 		{
-			damage = 2;
+			damage = 0;
+			s = Name + " missed!";
 		}
-		else
+		//critical hit
+		if (random == 4)
 		{
-			damage = 2 * (AttPower - c->GetDefPower());
+			if ((AttPower - c->GetDefPower()) <= 0)
+			{
+				damage = 2;
+			}
+			else
+			{
+				damage = 2 * (AttPower - c->GetDefPower());
+			}
+			convert << damage;
+			dam=convert.str();
+			s = "It's a critical hit! " + Name + " did " + dam + " damage.";
 		}
-		s = "It's a critical hit! " + Name + " did " + to_string(damage) + " damage.";
-	}
-	//normal attack
-	if (random > 1 && random < 10)
-	{
-		if ((AttPower - c->GetDefPower()) <= 0)
+		//normal attack
+		if (random!=7&&random!=4)
 		{
-			damage = 1;
+			if ((AttPower - c->GetDefPower()) <= 0)
+			{
+				damage = 1;
+			}
+			else
+			{
+				damage = 1 * (AttPower - c->GetDefPower());
+			}
+			convert << damage;
+			dam=convert.str();
+			s = Name + " did " + dam + " damage.";
 		}
-		else
-		{
-			damage = 1 * (AttPower - c->GetDefPower());
-		}
-		s = Name + " did " + to_string(damage) + " damage.";
 	}
 	c->ChangeHealth(-damage);
 	return s;
 }
-//*************************************
+//****************************************************
 
 //constructs the initial player
 Player::Player()
@@ -252,20 +306,20 @@ void Player::GainExperience(Character c)
 //adds a random amount of Food to the player's inventory
 void Player::FindFood()
 {
-	random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<> dis(1, 4);
-	int random = dis(gen);
+	mt19937 gen;
+	gen.seed(random_device()());
+	uniform_int_distribution<mt19937::result_type> dist(4,6);
+	int random = dist(gen);
 	Food += random;
 }
 
 //adds a random amount of Gatorade to the player's inventory
 void Player::FindGatorade()
 {
-	random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<> dis(1, 4);
-	int random = dis(gen);
+	mt19937 gen;
+	gen.seed(random_device()());
+	uniform_int_distribution<mt19937::result_type> dist(4,6);
+	int random = dist(gen);
 	Gatorade += random;
 }
 
@@ -308,17 +362,20 @@ int Player::GetyLocation()
 //returns the player's stats on the map
 string Player::PrintMapStats()
 {
-	return "Level[" + to_string(Level) + "], EXP[" + to_string(Experience) + "/" + to_string(LevelUpEXP)
-			+ "], Health[" + to_string(Health) + "/" + to_string(MaxHealth) + "], Stamina["
-			+ to_string(Stamina) + "/" + to_string(MaxStamina) + "], Food[" + to_string(Food)
-			+ "], Gatorade[" + to_string(Gatorade) + "]\n";
+	stringstream convert;
+	convert << "Level[" << Level << "], EXP[" << Experience << "/" << LevelUpEXP << "], Health[" << Health << "/" << MaxHealth << "], Stamina[" << Stamina << "/" << MaxStamina << "], Food[" << Food << "], Gatorade[" << Gatorade << "]\n";
+	string s=convert.str();
+	return s;
 }
 
 //returns the player's stats during combat
 string Player::PrintCombatStats()
 {
-	return "Albert: Level[" + to_string(Level) + "], Health[" + to_string(Health) + "/"
-			+ to_string(MaxHealth) + "], Food[" + to_string(Food) + "]\n";
+	stringstream convert;
+	convert << "Albert: Level[" << Level << "], Health[" << Health << "/"
+			<< MaxHealth << "], Food[" << Food << "]\n";
+	string s=convert.str();
+	return s;
 }
 
 void Player::SaveStats()
@@ -355,29 +412,33 @@ void Player::RevertStats()
 	xLocation=SavedStats.at(11);
 	yLocation=SavedStats.at(12);
 }
-//*************************************
+//****************************************************
 
 //randomizes an enemy's level
 int Enemy::RandomizeLevel(int low, int high)
 {
-	random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<> dis(low, high);
-	int level = dis(gen);
+	uniform_int_distribution<mt19937::result_type> dist(low,high);
+	int level = dist(gen);
 	return level;
 }
 
 //returns the enemy's stats during combat
 string Enemy::PrintEnemyStats()
 {
-	return  Name + ": Level[" + to_string(Level) + "], Health[" + to_string(Health) + "/"
-			+ to_string(MaxHealth) + "]\n";
+	stringstream convert;
+	convert << Name << ": Level[" << Level << "], Health[" << Health << "/"
+			<< MaxHealth << "]\n";
+	string s=convert.str();
+	return s;
 }
 
 //prints out the ascii representation of the monster
 void Enemy::PrintAscii()
 {
-	cout << Ascii;
+	for(int i = 1; i < 25; i++)
+	{
+		cout << Ascii[i] << "\n";
+	}
 }
 
 //creates a Bat of a random level between 1-2
@@ -391,7 +452,31 @@ Bat::Bat()
 	AttPower = 4 + Level;
 	DefPower = 1 + Level;
 	Experience = 10 * Level;
-	Ascii ="                  _-.                       .-_\n               _..-\'(                       )`-.._\n            ./\'. \'||\\\\.       (\\_/)       .//||` .`\\.\n         ./\'.|\'.\'||||\\\\|..    )-.-(    ..|//||||`.`|.`\\.\n      ./\'..|\'.|| |||||\\```````  \"  \'\'\'\'\'\'\'/||||| ||.`|..`\\.\n    ./\'.||\'.|||| ||||||||||||.     .|||||||||||| ||||.`||.`\\.\n   /\'|||\'.|||||| ||||||||||||{     }|||||||||||| ||||||.`|||`\\\n  \'.|||\'.||||||| ||||||||||||{     }|||||||||||| |||||||.`|||.`\n \'.||| ||||||||| |/\'   ``\\||/`     \'\\||/\'\'   `\\| ||||||||| |||.`\n |/\' \\./\'     `\\./          |/\\   /\\|          \\./\'     `\\./ `\\|\n V    V         V          }\' `\\ /\' `{          V         V    V\n `    `         `               U               \'         \'    \'\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                    _-.                       .-                    |");
+	Ascii.push_back("|                 _..-'(                       )`-.._                |");
+	Ascii.push_back("|              ./'. '||\\.       (\\_/)       .//||` .`\\.              |");
+	Ascii.push_back("|           ./'.|'.'||||\\|..    )-.-(    ..|//||||`.`|.`\\.           |");
+	Ascii.push_back("|       ./'..|'.|| |||||\\```````  \"  '''''''/||||| ||.`|..`\\.        |");
+	Ascii.push_back("|     ./'.||'.|||| ||||||||||||.     .|||||||||||| ||||.`||.`\\.      |");
+	Ascii.push_back("|    /'|||'.|||||| ||||||||||||{     }|||||||||||| ||||||.`|||`\\     |");
+	Ascii.push_back("|   '.|||'.||||||| ||||||||||||{     }|||||||||||| |||||||.`|||.`    |");
+	Ascii.push_back("|  '.||| ||||||||| |/'   ``\\||/`     '\\||/''   `\\| ||||||||| |||.`   |");
+	Ascii.push_back("|  |/' \\./'     `\\./          |/\\   /\\|          \\./'     `\\./ `\\|   |");
+	Ascii.push_back("|  V    V         V          }' `\\ /' `{          V         V    V   |");
+	Ascii.push_back("|  `    `         `               U               '         '    '   |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates a Scorpion of a random level between 3-4
@@ -405,7 +490,31 @@ Scorpion::Scorpion()
 	AttPower = 4 + Level;
 	DefPower = 1 + Level;
 	Experience = 10 * Level;
-	Ascii ="     ___ __ \n   _{___{__}\\\n  {_}      `\\)            \n {_}         ;           _.-\'\'\'\'--.._\n {_}                    //\'.--.  \\___`.\n  { }__,_.--~~~-~~~-~~-::.---. `-.\\  `.)\n   `-.{_{_{_{_{_{_{_{_//  -- 8;=- `\n      `-:,_.:,_:,_:,.`\\\\._ ..\'=- , \n          // // // //`-.`\\`   .-\'/\n         << << << <<    \\ `--\'  /----)\n          ^  ^  ^  ^     `-.....--\'\'\'\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                   ___ __                                           |");
+	Ascii.push_back("|                 _{___{__}\\                                         |");
+	Ascii.push_back("|                {_}      `\\)                                        |");
+	Ascii.push_back("|               {_}         ;           _.-''''--.._                 |");
+	Ascii.push_back("|               {_}                    //'.--.  \\___`.               |");
+	Ascii.push_back("|                { }__,_.--~~~-~~~-~~-::.---. `-.\\  `.)              |");
+	Ascii.push_back("|                 `-.{_{_{_{_{_{_{_{_//  -- 8;=- `                   |");
+	Ascii.push_back("|                    `-:,_.:,_:,_:,.`\\._ ..'=- ,                     |");
+	Ascii.push_back("|                        // // // //`-.`\\`   .-'/                    |");
+	Ascii.push_back("|                       << << << <<    \\ `--'  /----)                |");
+	Ascii.push_back("|                        ^  ^  ^  ^     `-.....--'''                 |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates the Dragon boss
@@ -419,7 +528,31 @@ Dragon::Dragon()
 	AttPower = 12;
 	DefPower = 6;
 	Experience = 350;
-	Ascii ="           /|                                           |\\\n          /||             ^               ^             ||\\\n         / \\\\__          //               \\\\          __// \\\n        /  |_  \\         | \\   /     \\   / |         /  _|  \\\n       /  /  \\  \\         \\  \\/ \\---/ \\/  /         /  /     \\\n      /  /    |  \\         \\  \\/\\   /\\/  /         /  |       \\\n     /  /     \\   \\__       \\ ( 0\\ /0 ) /       __/   /        \\\n    /  /       \\     \\___    \\ \\_/|\\_/ /    ___/     /\\         \\\n   /  /         \\_)      \\___ \\/-\\|/-\\/ ___/      (_/\\ \\      `  \\\n  /  /           /\\__)       \\/  oVo  \\/       (__/   ` \\      `  \\\n /  /           /,   \\__)    (_/\\ _ /\\_)    (__/         `      \\  \\\n/  \'           //       \\__)  (__V_V__)  (__/                    \\  \\\n  \'  \'        /\'           \\   |{___}|   /         .              \\  \n \'  /        /              \\/ |{___}| \\/\\          `              \\  \n   /        \'       .        \\/{_____}\\/  \\          \\    `         \\  \n  /                ,         /{_______}\\   \\          \\    \\        \n                  /         /{___/_\\___}\\   `          \\    `\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|           /|                                           |\\          |");
+	Ascii.push_back("|          /||             ^               ^             ||\\         |");
+	Ascii.push_back("|         / \\__           //               \\\\          __// \\        |");
+	Ascii.push_back("|        /  |_  \\         | \\   /     \\   / |         /  _|  \\       |");
+	Ascii.push_back("|       /  /  \\  \\         \\  \\/ \\---/ \\/  /         /  /     \\      |");
+	Ascii.push_back("|      /  /    |  \\         \\  \\/\\   /\\/  /         /  |       \\     |");
+	Ascii.push_back("|     /  /     \\   \\__       \\ ( 0\\ /0 ) /       __/   /        \\    |");
+	Ascii.push_back("|    /  /       \\     \\___    \\ \\_/|\\_/ /    ___/     /\\         \\   |");
+	Ascii.push_back("|   /  /         \\_)      \\___ \\/-\\|/-\\/ ___/      (_/\\ \\      `  \\  |");
+	Ascii.push_back("|  /  /           /\\__)       \\/  oVo  \\/       (__/   ` \\      `  \\ |");
+	Ascii.push_back("| /  /           /,   \\__)    (_/\\ _ /\\_)    (__/         `      \\  \\|");
+	Ascii.push_back("|/  '           //       \\__)  (__V_V__)  (__/                    \\  |");
+	Ascii.push_back("|  '  '        /'           \\   |{___}|   /         .              \\ |");
+	Ascii.push_back("| '  /        /              \\/ |{___}| \\/\\          `              \\|");
+	Ascii.push_back("|   /        '       .        \\/{_____}\\/  \\          \\    `         |");
+	Ascii.push_back("|  /                ,         /{_______}\\   \\          \\    \\        |");
+	Ascii.push_back("|                  /         /{___/_\\___}\\   `          \\    `       |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates a Rhino of a random level between 4-5
@@ -433,7 +566,31 @@ Rhino::Rhino()
 	AttPower = 4 + Level;
 	DefPower = 4 + Level;
 	Experience = 10 * Level;
-	Ascii ="                     ,-.             __\n                   ,\'   `---.___.---\'  `.\n                 ,\'   ,-                 `-._\n               ,\'    /                       \\\n            ,\\/     /                        \\\\\n        )`._)>)     |                         \\\\\n        `>,\'    _   \\                  /       |\\\n          )      \\   |   |            |        |\\\\\n .   ,   /        \\  |    `.          |        | ))\n \\`. \\`-\'          )-|      `.        |        /((\n  \\ `-`   o`     _/ ;\\ _     )`-.___.--\\      /  `\'\n   `._         ,\'    \\`j`.__/        \\  `.    \\\n     / ,    ,\'       _)\\   /`        _) ( \\   /\n     \\__   /        /___) (         /____\\_) (\n       `--\'           /____\\             /____\\\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                             ,-.             __                     |");
+	Ascii.push_back("|                           ,'   `---.___.---'  `.                   |");
+	Ascii.push_back("|                         ,'   ,-                 `-._               |");
+	Ascii.push_back("|                       ,'    /                       \\              |");
+	Ascii.push_back("|                    ,\\/     /                        \\\\             |");
+	Ascii.push_back("|                )`._)>)     |                         \\\\            |");
+	Ascii.push_back("|                `>,'    _   \\                  /       |\\           |");
+	Ascii.push_back("|                  )      \\   |   |            |        |\\\\          |");
+	Ascii.push_back("|         .   ,   /        \\  |    `.          |        | ))         |");
+	Ascii.push_back("|         \\`. \\`-'          )-|      `.        |        /((          |");
+	Ascii.push_back("|          \\ `-`   o`     _/ ;\\ _     )`-.___.--\\      /  `'         |");
+	Ascii.push_back("|           `._         ,'    \\`j`.__/        \\  `.    \\             |");
+	Ascii.push_back("|             / ,    ,'       _)\\   /`        _) ( \\   /             |");
+	Ascii.push_back("|             \\__   /        /___) (         /____\\_) (              |");
+	Ascii.push_back("|               `--'           /____\\             /____\\             |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates a Tiger of a random level between 6-7
@@ -447,7 +604,31 @@ Tiger::Tiger()
 	AttPower = 5 + Level;
 	DefPower = 3 + Level;
 	Experience = 10 * Level;
-	Ascii ="   _\n  ( \\                ..-----..__\n   \\.\'.        _.--\'`  \'   \'  \' ```\'-._\n    `. `\'-..-\'\' `    \'  \'      . ;   ; `-\'\'\'-.,__/|/|\n      `\'-.;..-\'\'`|\'  `.  \'.    ;     \'  `    \'   `\'  `,\n                 \\ \'   .    \' .     \'   ;   .`   . \' o \\\n                  \'.\' . \' -.\\     .`   .`  .   .\\     `Y\n                    \'-.\' .   |\\  \'   ,    \'    /\'`--;;\'\n                      /\\   \'.| \'-._ /    \' _.-\'\n                      \\\'\\  \' / (`-.\'.\'  .\"/\n                       \\ )` /   .\'   .-\'./\n                        \'\\  \\).\'  .-\'--\"\n                          \'. `,_\'`\n                            `.__)\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|         _                                                          |");
+	Ascii.push_back("|        ( \\                ..-----..__                              |");
+	Ascii.push_back("|         \\.'.        _.--'`  '   '  ' ```'-._                       |");
+	Ascii.push_back("|          `. `'-..-'' `    '  '      . ;   ; `-'''-.,__/|/|         |");
+	Ascii.push_back("|            `'-.;..-''`|'  `.  '.    ;     '  `    '   `'  `,       |");
+	Ascii.push_back("|                       \\ '   .    ' .     '   ;   .`   . ' o \\      |");
+	Ascii.push_back("|                        '.' . ' -.\\     .`   .`  .   .\\     `Y      |");
+	Ascii.push_back("|                          '-.' .   |\\  '   ,    '    /'`--;;'       |");
+	Ascii.push_back("|                            /\\   '.| '-._ /    ' _.-'               |");
+	Ascii.push_back("|                            \\'\\  ' / (`-.'.'  .\"/                   |");
+	Ascii.push_back("|                             \\ )` /   .'   .-'./                    |");
+	Ascii.push_back("|                              '\\  \\).'  .-'--\"                      |");
+	Ascii.push_back("|                                '. `,_'`                            |");
+	Ascii.push_back("|                                  `.__)                             |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates the Gorilla boss
@@ -461,7 +642,31 @@ Gorilla::Gorilla()
 	AttPower = 18;
 	DefPower = 10;
 	Experience = 700;
-	Ascii ="                     ,.-\"\"\"-.,\n                    /   ===   \\\n                   /  =======  \\\n                __|  (O)   (O)  |__      \n               / _|    .---.    |_ \\         \n              | /.----/ O O \\----.\\ |       \n               \\/     |     |     \\/        \n               |                   |                      \n               |       _____       |          \n               _\\     /_____\\     /_         \n           ,.-\"  \"-.,_________,.-\"  \"-.,\n          /          |       |          \\  \n         |           \\       /           | \n         \\            |     |            /             \n       ,/ |           \\     /           | \\,     \n     ,/   \\            |   |            /   \\,    \n    /      |           |   |           |      \\  \n   /        |          |---|          |        \\\n  /\"-.,_,.-\"/\"-.,__,.-\"\\   /\"-.,__,.-\"\\\"-.,_,.-\"\\\n |         |            \\ /            |         |\n  \\__|__|_/ \\__|__|__|__/ \\__|__|__|__/ \\_|__|__/\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                              ,.-\"\"\"-.,                             |");
+	Ascii.push_back("|                             /   ===   \\                            |");
+	Ascii.push_back("|                            /  =======  \\                           |");
+	Ascii.push_back("|                         __|  (O)   (O)  |__                        |");
+	Ascii.push_back("|                        / _|    .---.    |_ \\                       |");
+	Ascii.push_back("|                       | /.----/ O O \\----.\\ |                      |");
+	Ascii.push_back("|                        \\/     |     |     \\/                       |");
+	Ascii.push_back("|                        |                   |                       |");
+	Ascii.push_back("|                        |       _____       |                       |");
+	Ascii.push_back("|                        _\\     /_____\\     /_                       |");
+	Ascii.push_back("|                    ,.-\"  \"-.,_________,.-\"  \"-.,                   |");
+	Ascii.push_back("|                   /          |       |          \\                  |");
+	Ascii.push_back("|                  |           \\       /           |                 |");
+	Ascii.push_back("|                  \\            |     |            /                 |");
+	Ascii.push_back("|                ,/ |           \\     /           | \\,               |");
+	Ascii.push_back("|              ,/   \\            |   |            /   \\,             |");
+	Ascii.push_back("|             /      |           |   |           |      \\            |");
+	Ascii.push_back("|            /        |          |---|          |        \\           |");
+	Ascii.push_back("|           /\"-.,_,.-\"/\"-.,__,.-\"\\   /\"-.,__,.-\"\\\"-.,_,.-\"\\          |");
+	Ascii.push_back("|          |         |            \\ /            |         |         |");
+	Ascii.push_back("|           \\__|__|_/ \\__|__|__|__/ \\__|__|__|__/ \\_|__|__/          |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates a Centaur of a random level between 9-10
@@ -475,7 +680,31 @@ Centaur::Centaur()
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
 	Experience = 10 * Level;
-	Ascii ="                  ___,       /\\\n                 /,===      |  |\n              ,==( \"|\"      |  |\n             ,===\'\\_-/       \\/\n              ,---\'  \\---.   ||\n             (     - -    )  |:\n             |  \\_. \'  _./\\ ,\'/\\\n             |  )       / ,-||\\/\n   ___       ( < \\     (\\___/||\n  /   \\,----._\\ \\(   \'  )    --\n (   /         \\|\'\',, ,\'\\\n )   |          )\\   \'   |\n (  (|     ,    \\_)      |\n  )  )\\     \\-.__\\   |_, /\n  ( (  \\    )  )  ]  |  (\n   ) ) _) _/ _/   /, )) /\n   (/  \\  \\ \\      \\ |\\ |\n    )  _) \\__\\     ) | )(\n       )_,\\ )_\\    )| <_\\\n         )_\\      /_(  |_\\\n                   )_\\";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                    ___,       /\\                   |");
+	Ascii.push_back("|                                   /,===      |  |                  |");
+	Ascii.push_back("|                                ,==( \"|\"      |  |                  |");
+	Ascii.push_back("|                               ,==='\\_-/       \\/                   |");
+	Ascii.push_back("|                                ,---'  \\---.   ||                   |");
+	Ascii.push_back("|                               (     - -    )  |:                   |");
+	Ascii.push_back("|                               |  \\_. '  _./\\ ,'/\\                  |");
+	Ascii.push_back("|                               |  )       / ,-||\\/                  |");
+	Ascii.push_back("|                     ___       ( < \\     (\\___/||                   |");
+	Ascii.push_back("|                    /   \\,----._\\ \\(   '  )    --                   |");
+	Ascii.push_back("|                   (   /         \\|'',, ,'\\                         |");
+	Ascii.push_back("|                   )   |          )\\   '   |                        |");
+	Ascii.push_back("|                   (  (|     ,    \\_)      |                        |");
+	Ascii.push_back("|                    )  )\\     \\-.__\\   |_, /                        |");
+	Ascii.push_back("|                    ( (  \\    )  )  ]  |  (                         |");
+	Ascii.push_back("|                     ) ) _) _/ _/   /, )) /                         |");
+	Ascii.push_back("|                     (/  \\  \\ \\      \\ |\\ |                         |");
+	Ascii.push_back("|                      )  _) \\__\\     ) | )(                         |");
+	Ascii.push_back("|                         )_,\\ )_\\    )| <_\\                         |");
+	Ascii.push_back("|                           )_\\      /_(  |_\\                        |");
+	Ascii.push_back("|                                     )_\\                            |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates a Griffin of a random level between 11-12
@@ -489,7 +718,31 @@ Griffin::Griffin()
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
 	Experience = 10 * Level;
-	Ascii ="              //           //\n             ///          ///\n            ////         ////\n            |////       /////\n            |))//;     /)))//;\n           /)))))/;   /)))))/;\n       .---`,))))/;  /)))))))/;\n   __--\\/o-  \\`))/; |)))))))/;\n  (----/    \\\\\\``;  |))))))/;\n     ~/-\\  \\\\\\\\\\``   \\))))))/;\n         \\\\\\\\\\\\\\\\`    |)))))/;\n         |\\\\\\\\\\\\\\\\___/))))))/;__-------.\n         //////|  ////))))))/;           \\___,\n        |||||||\\   \\\\|||||;:              \\_. \\\n        |\\\\\\\\\\\\\\\\\\                        |  | |\n         \\\\\\\\\\\\\\                          |  | |\n          |\\\\\\\\               __|        /   / /\n          | \\\\__\\     \\___----  |       |   / /\n          |    / |     >     \\   \\      \\  / /\n          |   /  |    /       \\   \\      >/ /  ,,\n          |   |  |   |         |   |    // /  //,\n          |   |  |   |         |   |   /| |   |\\\\,\n       _--\'   _--\'   |     _---_---\'  |  \\ \\__/\\|/\n      (-(-===(-(-(===/    (-(-=(-(-(==/   \\____/\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                      ///          ///                              |");
+	Ascii.push_back("|                     ////         ////                              |");
+	Ascii.push_back("|                     |////       /////                              |");
+	Ascii.push_back("|                     |))//;     /)))//;                             |");
+	Ascii.push_back("|                    /)))))/;   /)))))/;                             |");
+	Ascii.push_back("|                .---`,))))/;  /)))))))/;                            |");
+	Ascii.push_back("|            __--\\/o-  \\`))/; |)))))))/;                             |");
+	Ascii.push_back("|           (----/    \\\\\\``;  |))))))/;                              |");
+	Ascii.push_back("|              ~/-\\  \\\\\\\\\\``   \\))))))/;                             |");
+	Ascii.push_back("|                  \\\\\\\\\\\\\\\\`    |)))))/;                             |");
+	Ascii.push_back("|                  |\\\\\\\\\\\\\\\\___/))))))/;__-------.                   |");
+	Ascii.push_back("|                  //////|  ////))))))/;           \\___,             |");
+	Ascii.push_back("|                 |||||||\\   \\\\|||||;:              \\_. \\            |");
+	Ascii.push_back("|                 |\\\\\\\\\\\\\\\\\\                        |  | |           |");
+	Ascii.push_back("|                  \\\\\\\\\\\\\\                          |  | |           |");
+	Ascii.push_back("|                   |\\\\\\\\               __|        /   / /           |");
+	Ascii.push_back("|                   | \\\\__\\     \\___----  |       |   / /            |");
+	Ascii.push_back("|                   |    / |     >     \\   \\      \\  / /             |");
+	Ascii.push_back("|                   |   /  |    /       \\   \\      >/ /  ,,          |");
+	Ascii.push_back("|                   |   |  |   |         |   |    // /  //,          |");
+	Ascii.push_back("|                   |   |  |   |         |   |   /| |   |\\\\,         |");
+	Ascii.push_back("|                _--'   _--'   |     _---_---'  |  \\ \\__/\\|/         |");
+	Ascii.push_back("|               (-(-===(-(-(===/    (-(-=(-(-(==/   \\____/           |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //creates the Seminole boss
@@ -504,7 +757,31 @@ Seminole::Seminole()
 	AttPower = 25;
 	DefPower = 15;
 	Experience = 0;
-	Ascii ="          / \\  \n       -..\\|/.-  \n       `-.\\|/.-\'     \n  \'.--.`\\ \\|/ /\'.--.\'\n  \\ o \' ======= \' o /\n   \\_`-=========-\'_/    ~   ~   ~\n  .--./,\'o.-.o`,\\.--.     ~   ~   ~\n \\_`- \\= (___) =/-\'_/\n  .--.`\\ -___- /\'.--.\n  \\.----\\_____/---./ \n  ~|/     FSU     \\|~\n  ~|  |=========|  |~\n  ~|  |  /)_    |  |~\n  ~|__|=/| /====|__|~\n   _||_//|/     |||_\n  (  /(/_______/ _  \\\n   \\\\\\;;;;;;;;;\\) )))\n   // |-   _   -|\n      |___/ \\___|\n     (___)   (___)\n";
+	Ascii.push_back("======================================================================");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("|                          / \\                                       |");
+	Ascii.push_back("|                       -..\\|/.-                                     |");
+	Ascii.push_back("|                       `-.\\|/.-'                                    |");
+	Ascii.push_back("|                  '.--.`\\ \\|/ /'.--.'                               |");
+	Ascii.push_back("|                  \\ o ' ======= ' o /                               |");
+	Ascii.push_back("|                   \\_`-=========-'_/    ~   ~   ~                   |");
+	Ascii.push_back("|                  .--./,'o.-.o`,\\.--.     ~   ~   ~                 |");
+	Ascii.push_back("|                 \\_`- \\= (___) =/-'_/                               |");
+	Ascii.push_back("|                  .--.`\\ -___- /'.--.                               |");
+	Ascii.push_back("|                  \\.----\\_____/---./                                |");
+	Ascii.push_back("|                  ~|/     FSU     \\|~                               |");
+	Ascii.push_back("|                  ~|  |=========|  |~                               |");
+	Ascii.push_back("|                  ~|  |  /)_    |  |~                               |");
+	Ascii.push_back("|                  ~|__|=/| /====|__|~                               |");
+	Ascii.push_back("|                   _||_//|/     |||_                                |");
+	Ascii.push_back("|                  (  /(/_______/ _  \\                               |");
+	Ascii.push_back("|                   \\\\\\;;;;;;;;;\\) )))                               |");
+	Ascii.push_back("|                   // |-   _   -|                                   |");
+	Ascii.push_back("|                      |___/ \\___|                                   |");
+	Ascii.push_back("|                     (___)   (___)                                  |");
+	Ascii.push_back("|                                                                    |");
+	Ascii.push_back("----------------------------------------------------------------------");
 }
 
 //used to heal Seminole whenever health hits zero
@@ -515,88 +792,5 @@ void Seminole::DrinkHaterade()
 		Haterade--;
 		Health += 50;
 		AttPower += 4;
-	}
-}
-
-//**xLocations and yLocations need int values based on maps**//
-
-//example combat loop
-int main()
-{
-	Player p;
-	Bat e;
-	string pAction;
-	string eAttack;
-	int n;
-
-	cout << p.PrintCombatStats();
-	cout << e.PrintEnemyStats();
-	e.PrintAscii();
-	cout << "1. Attack  2. Eat  3. Flee" << endl;
-
-	while(true)
-	{
-		cin >> n;
-
-		//checks for good input
-		while(cin.fail() || n<1 || n>3)
-		{
-			while(cin.fail())
-			{
-				cout << "Error! Number not entered\n";
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cin >> n;
-			}
-			while(n<1 || n>3)
-			{
-				cout << "Error! Number is not one of the options\n";
-				cin >> n;
-				if(cin.fail())
-				{
-					break;
-				}
-			}
-		};
-
-		//clears previous screen
-		cout << endl << endl << endl << endl << endl << endl << endl << endl;
-
-		//option 1. Attack
-		if(n==1)
-		{
-			pAction=p.Attack(&e);
-			eAttack=e.Attack(&p);
-		}
-		//option 2. Eat
-		if(n==2)
-		{
-			pAction=p.Eat();
-			eAttack=e.Attack(&p);
-		}
-		//option 3. Flee
-		if(n==3)
-		{
-			break;
-		}
-
-		//checks to see if player or enemy is dead
-		if(p.GetHealth()==0)
-		{
-			return false;
-		}
-		if(e.GetHealth()==0)
-		{
-			p.GainExperience(e);
-			return true;
-		}
-
-		cout << p.PrintCombatStats();
-		cout << e.PrintEnemyStats();
-		e.PrintAscii();
-		cout << "1. Attack  2. Eat  3. Flee" << endl;
-
-		cout << pAction << endl;
-		cout << eAttack << endl;
 	}
 }

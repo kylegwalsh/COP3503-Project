@@ -12,6 +12,8 @@
 #include <string>
 #include <sstream>
 #include <random>
+#include <vector>
+#include <limits>
 using namespace std;
 
 //the overall character object
@@ -24,8 +26,10 @@ protected:
 	int Level;
 	int Experience;
 	string Name;
+	mt19937 gen;
 
 public:
+	Character();
 	int GetExperience();
 	int GetMaxHealth();
 	int GetHealth();
@@ -77,8 +81,8 @@ public:
 //a subclass holding enemy's data
 class Enemy: public Character{
 protected:
+	vector<string> Ascii;
 	bool Boss;
-	vector<string> asciivector;
 
 public:
 	int RandomizeLevel(int low, int high);
