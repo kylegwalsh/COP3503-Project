@@ -44,8 +44,8 @@ void Game::playLevel()
 
 	//creates and stores the first 2 bosses
 	Enemy** bosses = new Enemy*[2];
-	bosses[0] = new Dragon();
-	bosses[1] = new Gorilla();
+	bosses[0] = Dragon();
+	bosses[1] = Gorilla();
 
 	//creates the final boss
 	Seminole s;
@@ -1348,14 +1348,7 @@ bool FinalBossCombat(Player *p, Seminole *e)
 */
 void Game::Clean()
 {
-	delete bosses[0];
-	delete bosses[1];
-	delete bosses;
-	for (int i=0; i<3; i++)
-	{
-		delete type1[i];
-		delete type2[i];
-	}
-	delete type1;
-	delete type2;
+	delete[] bosses;
+	delete[] type1;
+	delete[] type2;
 }
