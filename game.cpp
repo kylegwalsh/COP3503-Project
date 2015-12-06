@@ -44,8 +44,8 @@ void Game::playLevel()
 
 	//creates and stores the first 2 bosses
 	Enemy** bosses = new Enemy*[2];
-	bosses[0] = Dragon();
-	bosses[1] = Gorilla();
+	bosses[0] = new Dragon();
+	bosses[1] = new Gorilla();
 
 	//creates the final boss
 	Seminole s;
@@ -75,15 +75,13 @@ void Game::playLevel()
 
 	al.SetLocation(x, y);
 
-	update();
-
-	uniform_int_distribution < mt19337::result_type > dist(1, 100);
+	uniform_int_distribution < mt19937::result_type > dist(1, 100);
 	int random;
 
 	while (playing == true && !bossBeaten)
 	{
+		update();
 		random = dist(al.gen);
-
 		moved = false;
 
 		allow = map.getAllowableArea();
@@ -253,7 +251,6 @@ void Game::playLevel()
 						if (level == 3)
 						{
 							BeatGameScrn();
-							playing = false;
 						}
 						else
 						{
@@ -289,7 +286,6 @@ void Game::playLevel()
 		{
 			GameOverScrn();
 		}
-		update();
 
 		//cleans the game if you are no longer playing
 		if (playing == false)
@@ -350,6 +346,8 @@ void Game::update()
 	{
 		cout << "|                                                                       |\n";
 	}
+
+	printMap(al.GetxLocation(), al.GetyLocation());
 
 	for (int i = 0; i < verticalPadding; i++)
 	{
@@ -662,6 +660,8 @@ void Game::BeatGameScrn()
 			cout << "|                                                                                |\n";
 		}
 	}
+
+	playing = false;
 }
 
 //prints 35 blank lines to clear screen
