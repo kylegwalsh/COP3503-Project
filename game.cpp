@@ -22,7 +22,6 @@ void Game::start()
 	{
 		playLevel();
 	}
-	Clean();
 }
 
 void Game::setHorizontalPadding()
@@ -81,7 +80,7 @@ void Game::playLevel()
 	uniform_int_distribution < mt19337::result_type > dist(1, 100);
 	int random;
 
-	while (!bossBeaten)
+	while (playing == true && !bossBeaten)
 	{
 		random = dist(al.gen);
 
@@ -160,11 +159,11 @@ void Game::playLevel()
 				{
 					al.FindFood();
 				}
-				if (random>40 && random<=80)
+				if (random > 40 && random <= 80)
 				{
 					alive = Combat(&al, type1[level - 1]);
 				}
-				if (random>80 && random<=90)
+				if (random > 80 && random <= 90)
 				{
 					message = "You found a nice comfy little bed to sit your butt on! Gained health && stamina!";
 					al.Sleep();
@@ -239,12 +238,12 @@ void Game::playLevel()
 			{
 				if (keyFound)
 				{
-					if(level<3)
+					if (level < 3)
 					{
 						bossBeaten = Combat(&al, bosses[level - 1]);
 						alive = bossBeaten;
 					}
-					if(level==3)
+					if (level == 3)
 					{
 						bossBeaten = FinalBossCombat(&al, &s);
 					}
@@ -291,6 +290,12 @@ void Game::playLevel()
 			GameOverScrn();
 		}
 		update();
+
+		//cleans the game if you are no longer playing
+		if (playing == false)
+		{
+			Clean(bosses, type1, type2);
+		}
 	}
 }
 
@@ -360,7 +365,7 @@ void Game::update()
 }
 
 //prints the outline of max screen for the player to resize their console
-void ResizeScrn()
+void Game::ResizeScrn()
 {
 	ClearScrn();
 
@@ -392,7 +397,7 @@ void ResizeScrn()
 }
 
 //prints the start screen
-void StartScrn()
+void Game::StartScrn()
 {
 	ClearScrn();
 
@@ -434,7 +439,7 @@ void StartScrn()
 }
 
 //prints the level one intro screen
-void Level1IntroScrn()
+void Game::Level1IntroScrn()
 {
 	ClearScrn();
 
@@ -502,7 +507,7 @@ void Level1IntroScrn()
 }
 
 //prints the level 2 intro screen
-void Level2IntroScrn()
+void Game::Level2IntroScrn()
 {
 	ClearScrn();
 
@@ -558,7 +563,7 @@ void Level2IntroScrn()
 }
 
 //prints the level 3 intro screen
-void Level3IntroScrn()
+void Game::Level3IntroScrn()
 {
 	ClearScrn();
 
@@ -614,7 +619,7 @@ void Level3IntroScrn()
 }
 
 //prints the beat the game screen
-void BeatGameScrn()
+void Game::BeatGameScrn()
 {
 	ClearScrn();
 
@@ -657,12 +662,10 @@ void BeatGameScrn()
 			cout << "|                                                                                |\n";
 		}
 	}
-
-	exit(1);
 }
 
 //prints 35 blank lines to clear screen
-void ClearScrn()
+void Game::ClearScrn()
 {
 	for (int i = 0; i < 35; i++)
 	{
@@ -671,7 +674,7 @@ void ClearScrn()
 }
 
 //prints the level up screen
-void LevelUpScrn()
+void Game::LevelUpScrn()
 {
 	ClearScrn();
 
@@ -710,7 +713,7 @@ void LevelUpScrn()
 void Game::GameOverScrn()
 {
 	ClearScrn();
-	while (true)
+	while (playing == true)
 	{
 		for (int i = -2; i < 28; i++)
 		{
@@ -767,7 +770,7 @@ void Game::GameOverScrn()
 	}
 }
 
-void QuitScrn()
+void Game::QuitScrn()
 {
 	ClearScrn();
 
@@ -810,16 +813,16 @@ void QuitScrn()
 	//continue option which reverts stats and map to what they were at the start of the level
 	if (input == '1')
 	{
-		exit(1);
+		playing = false;
 	}
 	//quit option which ends the program
 	if (input == '2')
 	{
-		break;
+		return;
 	}
 }
 
-bool Combat(Player *p, Enemy *e)
+bool Game::Combat(Player *p, Enemy *e)
 {
 	string pAction;
 	string eAttack;
@@ -1078,7 +1081,7 @@ bool Combat(Player *p, Enemy *e)
 }
 
 //a special combat loop for the final boss that allows him to drink haterade
-bool FinalBossCombat(Player *p, Seminole *e)
+bool Game::FinalBossCombat(Player *p, Seminole *e)
 {
 	string pAction;
 	string eAction;
@@ -1345,9 +1348,9 @@ bool FinalBossCombat(Player *p, Seminole *e)
 }
 
 /*
-* Destroy all of the objects on the heap
-*/
-void Game::Clean()
+ * Destroy all of the objects on the heap
+ */
+void Game::Clean(Enemy** bosses, Enemy** type1, Enemy** type2)
 {
 	delete[] bosses;
 	delete[] type1;

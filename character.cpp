@@ -66,7 +66,7 @@ void Character::ChangeHealth(int h)
 //determines how much damage an attack does and whether it misses
 string Character::Attack(Character *c)
 {
-	uniform_int_distribution<mt19937::result_type> dist(1, 10);
+	uniform_int_distribution < mt19937::result_type > dist(1, 10);
 	int random = dist(gen);
 	int damage;
 	stringstream convert;
@@ -230,7 +230,7 @@ void Player::LevelUp()
 	Stamina = MaxStamina;
 	AttPower += 1;
 	DefPower += 1;
-	Experience = Experience-LevelUpEXP;
+	Experience = Experience - LevelUpEXP;
 	LevelUpEXP += 50;
 }
 
@@ -308,7 +308,7 @@ void Player::FindFood()
 {
 	mt19937 gen;
 	gen.seed(random_device()());
-	uniform_int_distribution<mt19937::result_type> dist(4, 6);
+	uniform_int_distribution < mt19937::result_type > dist(4, 6);
 	int random = dist(gen);
 	Food += random;
 }
@@ -318,7 +318,7 @@ void Player::FindGatorade()
 {
 	mt19937 gen;
 	gen.seed(random_device()());
-	uniform_int_distribution<mt19937::result_type> dist(4, 6);
+	uniform_int_distribution < mt19937::result_type > dist(4, 6);
 	int random = dist(gen);
 	Gatorade += random;
 }
@@ -423,7 +423,7 @@ void Player::RevertStats()
 //randomizes an enemy's level
 int Enemy::RandomizeLevel(int low, int high)
 {
-	uniform_int_distribution<mt19937::result_type> dist(low, high);
+	uniform_int_distribution < mt19937::result_type > dist(low, high);
 	int level = dist(gen);
 	return level;
 }

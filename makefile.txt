@@ -1,0 +1,17 @@
+SavingAlberta: MapCreator.o Map.o Character.o Game.o Driver.cpp
+	g++ -o SavingAlberta MapCreator.o Map.o Character.o Game.o Driver.cpp
+
+MapCreator.o: MapCreator.cpp MapCreator.h
+	g++ -o MapCreator MapCreator.cpp
+
+Map.o: Map.cpp Map.h
+	g++ -o Map Map.cpp
+
+Character.o: character.cpp character.h
+	g++ -o Character character.cpp
+
+Game.o: game.cpp game.h
+	g++ -o Game game.cpp
+
+Clean: 
+	rm *o SavingAlberta

@@ -9,19 +9,19 @@
 #include <cstdlib>
 #include <ctime>
 
-class MapCreator 
+class MapCreator
 {
 private:
 	int mapLevel;
-	std::vector<std::string> map; 
+	std::vector<std::string> map;
 	int rows;
 	int columns;
 	//number of diffferent areas
 	int gatoradeMachines; //Representation G
 	int houseNum; //Representation H
- 	int barracksNum; //M
+	int barracksNum; //M
 	int towerNum; //T
-	
+
 	void assignAreaAmounts();
 	void assignHeightWidth();
 	void createBasicMap();

@@ -17,7 +17,8 @@
 using namespace std;
 
 //the overall character object
-class Character{
+class Character
+{
 protected:
 	int MaxHealth;
 	int Health;
@@ -41,7 +42,8 @@ public:
 };
 
 //a subclass holding the player's data
-class Player: public Character{
+class Player: public Character
+{
 private:
 	int Food;
 	int Gatorade;
@@ -80,7 +82,8 @@ public:
 };
 
 //a subclass holding enemy's data
-class Enemy: public Character{
+class Enemy: public Character
+{
 protected:
 	vector<string> Ascii;
 	bool Boss;
@@ -92,57 +95,66 @@ public:
 };
 
 //a specific class for a Bat enemy
-class Bat: public Enemy{
+class Bat: public Enemy
+{
 public:
 	Bat();
 };
 
 //a specific class for a Scorpion enemy
-class Scorpion: public Enemy{
+class Scorpion: public Enemy
+{
 public:
 	Scorpion();
 };
 
 //a specific class for the first boss (Dragon)
-class Dragon: public Enemy{
+class Dragon: public Enemy
+{
 public:
 	Dragon();
 };
 
 //a specific class for a Rhino enemy
-class Rhino: public Enemy{
+class Rhino: public Enemy
+{
 public:
 	Rhino();
 };
 
 //a specific class for a Tiger enemy
-class Tiger: public Enemy{
+class Tiger: public Enemy
+{
 public:
 	Tiger();
 };
 
 //a specific class for the second Boss (Gorilla)
-class Gorilla: public Enemy{
+class Gorilla: public Enemy
+{
 public:
 	Gorilla();
 };
 
 //a specific class for a Centaur enemy
-class Centaur: public Enemy{
+class Centaur: public Enemy
+{
 public:
 	Centaur();
 };
 
 //a specific class for a Griffin enemy
-class Griffin: public Enemy{
+class Griffin: public Enemy
+{
 public:
 	Griffin();
 };
 
 //a specific class for the final boss (Seminole)
-class Seminole: public Enemy{
+class Seminole: public Enemy
+{
 private:
-int Haterade;
+	int Haterade;
 
 public:
 	Seminole();
