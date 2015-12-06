@@ -1342,3 +1342,20 @@ bool FinalBossCombat(Player *p, Seminole *e)
 		cout << "======================================================================" << endl;
 	}
 }
+
+/*
+* Destroy all of the objects on the heap
+*/
+void Game::Clean()
+{
+	delete bosses[0];
+	delete bosses[1];
+	delete bosses;
+	for (int i=0; i<3; i++)
+	{
+		delete type1[i];
+		delete type2[i];
+	}
+	delete type1;
+	delete type2;
+}
