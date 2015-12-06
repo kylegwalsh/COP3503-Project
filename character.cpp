@@ -49,6 +49,7 @@ string Character::GetName()
 	return Name;
 }
 
+//returns the player's random number generator
 mt19937 Character::GetGen()
 {
 	return gen;
@@ -71,6 +72,7 @@ void Character::ChangeHealth(int h)
 //determines how much damage an attack does and whether it misses
 string Character::Attack(Character *c)
 {
+	//a random number generator to determine the value of random
 	uniform_int_distribution < mt19937::result_type > dist(1, 10);
 	int random = dist(gen);
 	int damage;
@@ -178,8 +180,8 @@ Player::Player()
 	Level = 1;
 	Experience = 0;
 	LevelUpEXP = 100;
-	xLocation = 10;
-	yLocation = 7;
+	xLocation = 7;
+	yLocation = 9;
 }
 
 //changes the player's stamina
@@ -206,7 +208,7 @@ string Player::Eat()
 	else
 	{
 		Food--;
-		ChangeHealth(20);
+		ChangeHealth(35);
 		return "Your health has been restored!";
 	}
 }
@@ -226,7 +228,7 @@ string Player::Drink()
 	}
 }
 
-//levels the player up and changes his stats
+//levels the player up and increases his stats
 void Player::LevelUp()
 {
 	Level += 1;
@@ -311,6 +313,7 @@ void Player::GainExperience(Character *c)
 //adds a random amount of Food to the player's inventory
 void Player::FindFood()
 {
+	//a random number generator to randomize the amount of food that is found
 	mt19937 gen;
 	gen.seed(random_device()());
 	uniform_int_distribution < mt19937::result_type > dist(4, 6);
@@ -321,6 +324,7 @@ void Player::FindFood()
 //adds a random amount of Gatorade to the player's inventory
 void Player::FindGatorade()
 {
+	//a random number generator to randomize the amount of gatorade that is found
 	mt19937 gen;
 	gen.seed(random_device()());
 	uniform_int_distribution < mt19937::result_type > dist(4, 6);
@@ -328,10 +332,11 @@ void Player::FindGatorade()
 	Gatorade += random;
 }
 
+//restores the player's health and stamina when he sleeps in a bed
 void Player::Sleep()
 {
-	ChangeHealth(15);
-	ChangeStamina(10);
+	ChangeHealth(40);
+	ChangeStamina(20);
 }
 
 //returns the player's amount of food
@@ -370,12 +375,18 @@ int Player::GetyLocation()
 	return yLocation;
 }
 
+//returns the player's required EXP to level up
+int Player::GetLevelUpEXP()
+{
+	return LevelUpEXP;
+}
+
 //returns the player's stats on the map
 string Player::PrintMapStats()
 {
 	stringstream convert;
-	convert << "Level[" << Level << "], EXP[" << Experience << "/" << LevelUpEXP << "], Health[" << Health << "/" << MaxHealth << "], Stamina["
-			<< Stamina << "/" << MaxStamina << "], Food[" << Food << "], Gatorade[" << Gatorade << "]\n";
+	convert << "Level[" << Level << "] EXP[" << Experience << "/" << LevelUpEXP << "] HP[" << Health << "/" << MaxHealth << "] STAM[" << Stamina
+			<< "/" << MaxStamina << "] Food[" << Food << "] Gatorade[" << Gatorade << "]";
 	string s = convert.str();
 	return s;
 }
@@ -384,11 +395,12 @@ string Player::PrintMapStats()
 string Player::PrintCombatStats()
 {
 	stringstream convert;
-	convert << "Albert: Level[" << Level << "], Health[" << Health << "/" << MaxHealth << "], Food[" << Food << "]";
+	convert << "Albert: Level[" << Level << "] HP[" << Health << "/" << MaxHealth << "] Food[" << Food << "]";
 	string s = convert.str();
 	return s;
 }
 
+//saves the player's stats to be reinitialized if he dies
 void Player::SaveStats()
 {
 	SavedStats.clear();
@@ -407,6 +419,7 @@ void Player::SaveStats()
 	SavedStats.push_back(yLocation);
 }
 
+//reverts the player's stats to what they were at the start of the level
 void Player::RevertStats()
 {
 	Food = SavedStats.at(0);
@@ -428,8 +441,9 @@ void Player::RevertStats()
 //randomizes an enemy's level
 int Enemy::RandomizeLevel(int low, int high)
 {
-	uniform_int_distribution < mt19937::result_type > dist(low, high);
-	int level = dist(gen);
+	//creates a random number to be assigned to level
+	srand(time(0));
+	int level = rand() % 2 + low;
 	return level;
 }
 
@@ -437,7 +451,7 @@ int Enemy::RandomizeLevel(int low, int high)
 string Enemy::PrintEnemyStats()
 {
 	stringstream convert;
-	convert << Name << ": Level[" << Level << "], Health[" << Health << "/" << MaxHealth << "]";
+	convert << Name << ": Level[" << Level << "] HP[" << Health << "/" << MaxHealth << "]";
 	string s = convert.str();
 	return s;
 }
@@ -445,6 +459,7 @@ string Enemy::PrintEnemyStats()
 //prints out the ascii representation of the monster
 void Enemy::PrintAscii()
 {
+	//runs through the ascii vector and prints out each entry
 	for (int i = 1; i < 25; i++)
 	{
 		cout << Ascii[i] << "\n";
@@ -461,7 +476,7 @@ Bat::Bat()
 	Health = MaxHealth;
 	AttPower = 4 + Level;
 	DefPower = 1 + Level;
-	Experience = 10 * Level;
+	Experience = 15 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                                                                    |");
 	Ascii.push_back("|                                                                    |");
@@ -492,14 +507,14 @@ Bat::Bat()
 //creates a Scorpion of a random level between 3-4
 Scorpion::Scorpion()
 {
-	Name = "Bat";
+	Name = "Scorpion";
 	Boss = false;
 	Level = RandomizeLevel(3, 4);
 	MaxHealth = 10 + 5 * Level;
 	Health = MaxHealth;
 	AttPower = 4 + Level;
 	DefPower = 1 + Level;
-	Experience = 10 * Level;
+	Experience = 15 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                                                                    |");
 	Ascii.push_back("|                                                                    |");
@@ -575,7 +590,7 @@ Rhino::Rhino()
 	Health = MaxHealth;
 	AttPower = 4 + Level;
 	DefPower = 4 + Level;
-	Experience = 10 * Level;
+	Experience = 15 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                                                                    |");
 	Ascii.push_back("|                                                                    |");
@@ -613,7 +628,7 @@ Tiger::Tiger()
 	Health = MaxHealth;
 	AttPower = 5 + Level;
 	DefPower = 3 + Level;
-	Experience = 10 * Level;
+	Experience = 15 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                                                                    |");
 	Ascii.push_back("|                                                                    |");
@@ -689,7 +704,7 @@ Centaur::Centaur()
 	Health = MaxHealth;
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
-	Experience = 10 * Level;
+	Experience = 15 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                                                                    |");
 	Ascii.push_back("|                                                                    |");
@@ -727,7 +742,7 @@ Griffin::Griffin()
 	Health = MaxHealth;
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
-	Experience = 10 * Level;
+	Experience = 15 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                      ///          ///                              |");
 	Ascii.push_back("|                     ////         ////                              |");
@@ -800,7 +815,7 @@ int Seminole::GetHaterade()
 	return Haterade;
 }
 
-//used to heal Seminole whenever health hits zero
+//used to heal Seminole whenever health hits zero in the final boss combat
 void Seminole::DrinkHaterade()
 {
 	if (Haterade > 0)

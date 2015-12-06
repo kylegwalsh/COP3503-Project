@@ -7,30 +7,35 @@
 
 #include "game.h"
 
+//constructs the overall game object
 Game::Game()
 {
+	level = 1;
 	ResizeScrn();
 	StartScrn();
 	map = Map();
+	initializeAllowableArea();
 	setHorizontalPadding();
 }
 
+//starts the game
 void Game::start()
 {
 	playing = true;
-	while (playing)
-	{
-		playLevel();
-	}
+	playLevel();
 }
 
+//sets the horizontal padding (which is the amount of spaces that must be printed on the sides of the map)
 void Game::setHorizontalPadding()
 {
-	horizontalPadding = (70 - map.getColumns()) / 2;
+	horizontalPadding = (70 - (2 * map.getColumns())) / 2;
 }
 
+//the primary method for the game
+//initializes the level and loops until the level is beaten
 void Game::playLevel()
 {
+	//re-saves the player's stats
 	al.SaveStats();
 
 	char dir;
@@ -39,7 +44,6 @@ void Game::playLevel()
 
 	bool bossBeaten = false;
 	bool keyFound = false;
-	bool alive = true;
 	bool moved = false;
 
 	//creates and stores the first 2 bosses
@@ -50,9 +54,12 @@ void Game::playLevel()
 	//creates the final boss
 	Seminole s;
 
+	//creates the random enemies that will pop up throughout the game
+	//type 1 is weaker than type 2
 	Enemy** type1 = new Enemy*[3];
 	Enemy** type2 = new Enemy*[3];
 
+	//prints out the intro screen based on the level
 	switch (level)
 	{
 	case 1:
@@ -65,31 +72,45 @@ void Game::playLevel()
 
 	case 3:
 		Level3IntroScrn();
+		break;
 	}
 
+	//stores the maps data in a game field
 	mapData = map.getMapData();
 
 	//place character: bottom middle
-	x = map.getColumns() / 2;
-	y = map.getRows();
-
+	x = (map.getColumns() - 1) / 2;
+	y = map.getRows() - 1;
 	al.SetLocation(x, y);
 
+	//a random number generator that will determine what events take place in the game
 	uniform_int_distribution < mt19937::result_type > dist(1, 100);
 	mt19937 gen = al.GetGen();
 	int random;
 
+	//loops until the player quits or the boss is beaten
 	while (playing == true && !bossBeaten)
 	{
+		//checks if al has enough experience to level up
+		if (al.GetExperience() >= al.GetLevelUpEXP())
+		{
+			al.LevelUp();
+			LevelUpScrn();
+		}
+
+		//prints out the map screen
 		update();
+
+		//reverts the values stored in game at the start of each loop
+		message = "";
 		random = dist(gen);
 		moved = false;
 
-		allow = map.getAllowableArea();
-
+		//sets x and y to the player's new location
 		x = al.GetxLocation();
 		y = al.GetyLocation();
 
+		//adds new enemies to the enemy type vectors to randomize their levels
 		type1[0] = new Bat();
 		type1[1] = new Rhino();
 		type1[2] = new Centaur();
@@ -105,7 +126,7 @@ void Game::playLevel()
 		{
 		case 'w':
 			//if possible, move up
-			if (allow[y - 1][x] == 1)
+			if ((y - 1) >= 0)
 			{
 				al.MoveUp();
 				moved = true;
@@ -113,7 +134,7 @@ void Game::playLevel()
 			break;
 		case 's':
 			//if possible, move down
-			if (allow[y + 1][x] == 1)
+			if ((y + 1) < map.getRows())
 			{
 				al.MoveDown();
 				moved = true;
@@ -121,7 +142,7 @@ void Game::playLevel()
 			break;
 		case 'a':
 			//if possible, move left
-			if (allow[y][x - 1] == 1)
+			if ((x - 1) >= 0)
 			{
 				al.MoveLeft();
 				moved = true;
@@ -129,119 +150,155 @@ void Game::playLevel()
 			break;
 		case 'd':
 			//if possible, move right
-			if (allow[y][x + 1] == 1)
+			if ((x + 1) < map.getColumns())
 			{
 				al.MoveRight();
 				moved = true;
 			}
 			break;
+		case '3':
+			//if possible, eat
+			message = al.Eat();
+			break;
+		case '4':
+			//if possible, drink
+			message = al.Drink();
+			break;
 		case 'q':
+			//calls quit screen
 			QuitScrn();
 			break;
 		default:
+			//creates error if invalid key is pressed
 			message = "Invalid key pressed!";
 			break;
 		}
 
+		//runs if the player has moved on the map
 		if (moved)
 		{
 			//with new position
 			x = al.GetxLocation();
 			y = al.GetyLocation();
 
+			//stores the place value located at the player's location
 			place = mapData[y][x];
 
-			//house
+			//triggers if the player enters a house
 			if (place.compare("H") == 0)
 			{
-				if (random <= 40)
+				//find food
+				if (random <= 75)
 				{
+					message = "You found some food in the House";
 					al.FindFood();
 				}
-				if (random > 40 && random <= 80)
+				//trigger non-fleeable combat
+				if (random > 75 && random <= 85)
 				{
-					alive = Combat(&al, type1[level - 1]);
+					playing = NFCombat(&al, type1[level-1]);
 				}
-				if (random > 80 && random <= 90)
+				//find bed and sleep
+				if (random > 85 && random <= 95)
 				{
-					message = "You found a nice comfy little bed to sit your butt on! Gained health && stamina!";
+					message = "You found a nice comfy bed. Gained health && stamina!";
 					al.Sleep();
 				}
-				if (random > 90)
+				//stub toe and lose health
+				if (random > 95)
 				{
 					message = "You stubbed your toe! You lost 5 health!";
 					al.ChangeHealth(-5);
 				}
+				//makes the house no longer enterable
 				allow[y][x] = 0;
 			}
-			//tower
+			//triggers if the player enters a tower
 			else if (place.compare("T") == 0)
 			{
-				alive = Combat(&al, type1[level - 1]);
-				alive = Combat(&al, type2[level - 1]);
-				if (alive)
+				//combat with an enemy of both type
+				playing = NFCombat(&al, type1[level - 1]);
+				playing = NFCombat(&al, type2[level - 1]);
+
+				//if the player survives he gets the key to the boss
+				if (playing)
 				{
 					keyFound = true;
 				}
+				//makes the tower no longer enterable
 				allow[y][x] = 0;
 			}
+			//triggers if the player finds a gatorade machine
 			else if (place.compare("G") == 0)
 			{
+				//find gatorade
 				al.FindGatorade();
 				message = "You found a Gatorade machine! Your Gatorade has increased!";
 				allow[y][x] = 0;
 			}
-			//barracks
+			//triggers if the player enters barracks
 			else if (place.compare("M") == 0)
 			{
+				//step on landmine
 				if (random <= 10)
 				{
 					message = "You stepped on a landmine";
-					al.ChangeHealth(-25);
+					al.ChangeHealth(-20);
 				}
-				if (random > 10 && random <= 20)
+				//find extra food
+				if (random > 10 && random <= 30)
 				{
-					message = "You found some good eats";
+					message = "You found some army rations!";
 					al.FindFood();
 					al.FindFood();
 				}
-				if (random > 20 && random <= 50)
+				//fight two strong enemies
+				if (random > 30 && random <= 50)
 				{
-					alive = Combat(&al, type2[level - 1]);
-					alive = Combat(&al, type2[level - 1]);
+					playing = NFCombat(&al, type2[level - 1]);
+					playing = NFCombat(&al, type2[level - 1]);
 				}
+				//fight a strong and weak enemy
 				if (random > 50 && random <= 65)
 				{
-					alive = Combat(&al, type1[level - 1]);
-					alive = Combat(&al, type2[level - 1]);
+					playing = NFCombat(&al, type1[level - 1]);
+					playing = NFCombat(&al, type2[level - 1]);
 				}
+				//caught in a booby trap and lose health
 				if (random > 65 && random <= 75)
 				{
-					message = "You got caught in a booby trap, and got a little banged up";
-					al.ChangeHealth(-15);
+					message = "You got caught in a booby trap, oops!";
+					al.ChangeHealth(-5);
 				}
+				//find scale and gain stamina
 				if (random > 75 && random <= 97)
 				{
-					message = "You found one of Alberta's scales! Now you're motivated";
+					message = "You found one of Alberta's scales! Your stamina returns!";
 					al.ChangeStamina(10);
 				}
+				//fight 3 monsters
 				if (random > 97)
 				{
-					alive = Combat(&al, type2[level - 1]);
-					alive = Combat(&al, type1[level - 1]);
-					alive = Combat(&al, type2[level - 1]);
+					playing = NFCombat(&al, type2[level - 1]);
+					playing = NFCombat(&al, type1[level - 1]);
+					playing = NFCombat(&al, type2[level - 1]);
 				}
+				//makes the barracks no longer enterable
+				allow[y][x] = 0;
 			}
 			//level boss
 			else if (place.compare("B") == 0)
 			{
+				//key used to fight boss
 				if (keyFound)
 				{
+					//first two bosses
 					if (level < 3)
 					{
-						bossBeaten = Combat(&al, bosses[level - 1]);
-						alive = bossBeaten;
+						bossBeaten = NFCombat(&al, bosses[level - 1]);
+						playing = bossBeaten;
 					}
+					//final boss
 					if (level == 3)
 					{
 						bossBeaten = FinalBossCombat(&al, &s);
@@ -249,10 +306,12 @@ void Game::playLevel()
 
 					if (bossBeaten)
 					{
+						//beat game
 						if (level == 3)
 						{
 							BeatGameScrn();
 						}
+						//move to next level
 						else
 						{
 							loadNextLevel();
@@ -264,26 +323,26 @@ void Game::playLevel()
 					message = "You must find the key before you can battle the boss!";
 				}
 			}
-			else //if place=/
+			else //if place="//"
 			{
-				if (random <= 10)
+				if (random <= 17)
 				{
 					//chooses randomly type 1 or type 2 enemy for level
 					random = dist(gen);
 					if (random <= 62)
 					{
-						alive = Combat(&al, type1[level - 1]);
+						playing = Combat(&al, type1[level - 1]);
 					}
 					else
 					{
-						alive = Combat(&al, type2[level - 1]);
+						playing = Combat(&al, type2[level - 1]);
 					}
 				}
 			}
 		}
 
 		//check stats
-		if (al.GetHealth() <= 0 || !alive)
+		if (al.GetHealth() <= 0 || !playing)
 		{
 			GameOverScrn();
 		}
@@ -293,24 +352,56 @@ void Game::playLevel()
 		{
 			Clean(bosses, type1, type2);
 		}
+
+		//removes old enemies so that new enemies can be initialized at the beginning of the loop
+		for (int i = 0; i < 3; i++)
+		{
+			delete type1[i];
+			delete type2[i];
+		}
 	}
 }
 
+//loads the next level
 void Game::loadNextLevel()
 {
 	level++;
 	map.loadNext();
 	mapData = map.getMapData();
-	allow = map.getAllowableArea();
+	initializeAllowableArea();
 	setHorizontalPadding();
+	playLevel();
 }
 
-void Game::printMap(int playerX, int playerY) //changed to include border because pretty
+/*
+ * Initializes the int representeted boolean vector with all ones
+ * All of the map is allowable at the beginning of the level
+ */
+void Game::initializeAllowableArea()
 {
+	//clears the previous allowable area
+	allow.clear();
 
+	//initializes the new allowable area of the map
 	for (int i = 0; i < map.getRows(); i++)
 	{
-		for (int p = 0; p < horizontalPadding; p++)
+		vector<int> rowVec;
+		for (int j = 0; j < map.getColumns(); j++)
+		{
+			rowVec.push_back(1);
+		}
+		allow.push_back(rowVec);
+		rowVec.clear();
+	}
+}
+
+//prints the map
+void Game::printMap(int playerX, int playerY)
+{
+	for (int i = 0; i < map.getRows(); i++)
+	{
+		cout << "|";
+		for (int p = 0; p <= horizontalPadding; p++)
 		{
 			std::cout << " ";
 		}
@@ -329,19 +420,34 @@ void Game::printMap(int playerX, int playerY) //changed to include border becaus
 			}
 			else
 			{
-				std::cout << "X" << " ";
+				if (i == playerY && j == playerX)
+				{
+					std::cout << "@" << " ";
+				}
+				else
+				{
+					std::cout << "X" << " ";
+				}
 			}
 		}
+		for (int p = 0; p < horizontalPadding; p++)
+		{
+			std::cout << " ";
+		}
+		cout << "|\n";
 	}
 }
 
+//prints the overall map screen
 void Game::update()
 {
+	ClearScrn();
+
 	int verticalPadding = (20 - map.getRows()) / 2;
 
 	//prints screen
 	cout << " ======================================================================= \n";
-	cout << "| " << al.PrintMapStats() << std::string(69 - (al.PrintMapStats().size()), ' ') << "|\n";
+	cout << "|" << al.PrintMapStats() << string(71 - (al.PrintMapStats().size()), ' ') << "|\n";
 	cout << "|-----------------------------------------------------------------------|\n";
 	for (int i = 0; i < verticalPadding; i++)
 	{
@@ -355,9 +461,9 @@ void Game::update()
 		cout << "|                                                                       |\n";
 	}
 	cout << "|-----------------------------------------------------------------------|\n";
-	cout << "|  Messages: " << message << string(58 - message.size(), ' ') << "|\n";
+	cout << "|  Messages: " << message << string(58 - message.size(), ' ') << " |\n";
 	cout << "|                                                                       |\n";
-	cout << "|  Controls: wasd - move		q - quit	other controls?                |\n";
+	cout << "|  Controls: wasd - move, 3. Eat 4. Drink             q - quit          |\n";
 	cout << "|                                                                       |\n";
 	cout << " ======================================================================= \n";
 
@@ -756,21 +862,22 @@ void Game::GameOverScrn()
 		}
 
 		//continue option which reverts stats and map to what they were at the start of the level
-		if (input == 1)
+		if (input == '1')
 		{
-			map.reset();
+			initializeAllowableArea();
 			al.RevertStats();
 			keyFound = false;
 			return;
 		}
 		//quit option which ends the program
-		if (input == 2)
+		if (input == '2')
 		{
 			QuitScrn();
 		}
 	}
 }
 
+//the quit screen
 void Game::QuitScrn()
 {
 	ClearScrn();
@@ -819,12 +926,14 @@ void Game::QuitScrn()
 	//quit option which ends the program
 	if (input == '2')
 	{
-		return;
+		playing = true;
 	}
 }
 
+//the normal combat loop
 bool Game::Combat(Player *p, Enemy *e)
 {
+	ClearScrn();
 	string pAction;
 	string eAttack;
 	char n;
@@ -1081,9 +1190,265 @@ bool Game::Combat(Player *p, Enemy *e)
 	}
 }
 
+//combat method where you cannot flee
+bool Game::NFCombat(Player *p, Enemy *e)
+{
+	ClearScrn();
+	string pAction;
+	string eAttack;
+	char n;
+
+	//beginning of combat
+	vector<string> vert;
+	vert.push_back("|");
+	cout << "======================================================================" << endl;
+
+	//measure string length, output | then required number of spaces then text then spaces and |
+	cout << vert[0];
+	int spc = 68 - p->PrintCombatStats().length();
+	int spc2 = spc / 2;
+	if (spc % 2 == 0)
+	{
+		for (int i = 0; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << p->PrintCombatStats();
+		for (int i = 0; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << vert[0];
+	}
+	else
+	{
+		for (int i = 0; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << p->PrintCombatStats();
+		for (int i = -1; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << vert[0];
+	}
+
+	cout << endl;
+
+	cout << vert[0];
+	spc = 68 - e->PrintEnemyStats().length();
+	spc2 = spc / 2;
+	if (spc % 2 == 0)
+	{
+		for (int i = 0; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << e->PrintEnemyStats();
+		for (int i = 0; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << vert[0];
+	}
+	else
+	{
+		for (int i = 0; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << e->PrintEnemyStats();
+		for (int i = -1; i < spc2; i++)
+		{
+			cout << " ";
+		}
+		cout << vert[0];
+	}
+	cout << endl;
+	e->PrintAscii();
+	cout << vert[0] << "                                                                    " << vert[0] << endl;
+	cout << vert[0] << "                                                                    " << vert[0] << endl;
+	cout << vert[0] << "                        1. Attack  2. Eat                           " << vert[0] << endl;
+	cout << "======================================================================" << endl;
+
+	//enter loop for combat
+	while (true)
+	{
+		n = '0';
+
+		while (n != '1' && n != '2')
+		{
+			n = getch();
+		}
+
+		ClearScrn();
+		cout << endl << endl << endl << endl;
+
+		//option 1. Attack
+		if (n == '1')
+		{
+			pAction = p->Attack(e);
+			eAttack = e->Attack(p);
+		}
+		//option 2. Eat
+		if (n == '2')
+		{
+			pAction = p->Eat();
+			eAttack = e->Attack(p);
+		}
+
+		//checks to see if player or enemy is dead
+		if (p->GetHealth() == 0)
+		{
+			return false;
+		}
+		if (e->GetHealth() == 0)
+		{
+			p->GainExperience(e);
+			return true;
+		}
+
+		cout << "======================================================================" << endl;
+
+		//measure string length, output | then required number of spaces then text then spaces and |
+		cout << vert[0];
+		int spc = 68 - p->PrintCombatStats().length();
+		int spc2 = spc / 2;
+		if (spc % 2 == 0)
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << p->PrintCombatStats();
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		else
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << p->PrintCombatStats();
+			for (int i = -1; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+
+		cout << endl;
+
+		cout << vert[0];
+		spc = 68 - e->PrintEnemyStats().length();
+		spc2 = spc / 2;
+		if (spc % 2 == 0)
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << e->PrintEnemyStats();
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		else
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << e->PrintEnemyStats();
+			for (int i = -1; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		cout << endl;
+		e->PrintAscii();
+
+		//print pAction
+		cout << vert[0];
+		spc = 68 - pAction.length();
+		spc2 = spc / 2;
+		if (spc % 2 == 0)
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << pAction;
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		else
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << pAction;
+			for (int i = -1; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		cout << endl;
+
+		//print eAttack
+		cout << vert[0];
+		spc = 68 - eAttack.length();
+		spc2 = spc / 2;
+		if (spc % 2 == 0)
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << eAttack;
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		else
+		{
+			for (int i = 0; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << eAttack;
+			for (int i = -1; i < spc2; i++)
+			{
+				cout << " ";
+			}
+			cout << vert[0];
+		}
+		cout << endl;
+
+		cout << vert[0] << "                        1. Attack  2. Eat                           " << vert[0] << endl;
+		cout << "======================================================================" << endl;
+	}
+}
+
 //a special combat loop for the final boss that allows him to drink haterade
 bool Game::FinalBossCombat(Player *p, Seminole *e)
 {
+	ClearScrn();
 	string pAction;
 	string eAction;
 	char n;
@@ -1159,7 +1524,7 @@ bool Game::FinalBossCombat(Player *p, Seminole *e)
 	e->PrintAscii();
 	cout << vert[0] << "                                                                    " << vert[0] << endl;
 	cout << vert[0] << "                                                                    " << vert[0] << endl;
-	cout << vert[0] << "                     1. Attack  2. Eat  3. Flee                     " << vert[0] << endl;
+	cout << vert[0] << "                        1. Attack  2. Eat                           " << vert[0] << endl;
 	cout << "======================================================================" << endl;
 
 	//enter loop for combat
@@ -1167,7 +1532,7 @@ bool Game::FinalBossCombat(Player *p, Seminole *e)
 	{
 		n = '0';
 
-		while (n != '1' && n != '2' && n != '3')
+		while (n != '1' && n != '2')
 		{
 			n = getch();
 		}
@@ -1186,11 +1551,6 @@ bool Game::FinalBossCombat(Player *p, Seminole *e)
 		{
 			pAction = p->Eat();
 			eAction = e->Attack(p);
-		}
-		//option 3. Flee
-		if (n == '3')
-		{
-			return true;
 		}
 
 		//checks to see if player or enemy is dead
@@ -1311,7 +1671,7 @@ bool Game::FinalBossCombat(Player *p, Seminole *e)
 		}
 		cout << endl;
 
-		//print eAttack
+		//print eAction
 		cout << vert[0];
 		spc = 68 - eAction.length();
 		spc2 = spc / 2;
@@ -1343,7 +1703,7 @@ bool Game::FinalBossCombat(Player *p, Seminole *e)
 		}
 		cout << endl;
 
-		cout << vert[0] << "                     1. Attack  2. Eat  3. Flee                     " << vert[0] << endl;
+		cout << vert[0] << "                        1. Attack  2. Eat                           " << vert[0] << endl;
 		cout << "======================================================================" << endl;
 	}
 }

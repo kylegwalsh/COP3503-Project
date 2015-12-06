@@ -9,6 +9,7 @@ MapCreator::MapCreator()
 //creates a new map for the level
 void MapCreator::createNewLevel()
 {
+	map.clear();
 	assignHeightWidth();
 	createBasicMap();
 	assignAreaAmounts();
@@ -54,17 +55,20 @@ void MapCreator::assignHeightWidth()
  */
 void MapCreator::assignAreaAmounts()
 {
+	//places to be assigned for the first map
 	gatoradeMachines = 2;
 	houseNum = 3;
 	barracksNum = 0;
 	towerNum = 1;
 	switch (mapLevel)
 	{
+	//places to be assigned for the second map
 	case 2:
 		gatoradeMachines = 5;
 		houseNum = 4;
 		barracksNum = 3;
 		break;
+	//places to be assigned for the third map
 	case 3:
 		gatoradeMachines = 6;
 		houseNum = 7;
@@ -79,6 +83,7 @@ void MapCreator::assignAreaAmounts()
 	}
 }
 
+//creates a map filled with "\\"
 void MapCreator::createBasicMap()
 {
 
@@ -91,6 +96,7 @@ void MapCreator::createBasicMap()
 	}
 }
 
+//distributes the places to each map while their are still unassigned places
 void MapCreator::addEnvironment()
 {
 	map[columns / 2] = "B"; // inserting the boss
@@ -104,8 +110,8 @@ void MapCreator::addEnvironment()
 	{
 		while (objectsToInsert[i] > 0) //while that index still has more to place
 		{
-			tempX = (rand() % (columns - 2) + 2); //get random x value within 0 to columns
-			tempY = (rand() % (rows - 2) + 2); //get random y value within 0 to rows
+			tempX = (rand() % (columns - 3) + 2); //get random x value within 0 to columns
+			tempY = (rand() % (rows - 3) + 2); //get random y value within 0 to rows
 			if (isIsolated(tempX, tempY)) //if that index is isolated
 			{
 				map[(tempY * columns) + tempX] = symbols[i]; //insert the symbol
@@ -118,20 +124,13 @@ void MapCreator::addEnvironment()
 		}
 	}
 }
+
 /*
- * If the row(r) and column(c) location are within 2 spaces of a border, or
- * two spaces within another object (house, etc.) left and right, top and bottom, or
- * within one diagonal from another object then the object to be places is NOT isolated
+ * Returns a boolean that is true if there is nothing already stored at the location and false if there is
  */
 bool MapCreator::isIsolated(int c, int r)
 {
-	return (map[(r * columns) + c].compare("\\") == 0 && //at index
-			(map[(r * columns) + (c - 1)].compare("\\") == 0 && map[(r * columns) + (c + 1)].compare("\\") == 0) && //left and right 1
-			(map[(r * columns) + (c - 2)].compare("\\") == 0 && map[(r * columns) + (c + 2)].compare("\\") == 0) && //left and right 2
-			(map[((r + 1) * columns) + c].compare("\\") == 0 && map[((r - 1) * columns) + c].compare("\\") == 0) && //top and bottom 1
-			(map[((r + 2) * columns) + c].compare("\\") == 0 && map[((r - 2) * columns) + c].compare("\\") == 0) && //top and bottom 2
-			(map[((r - 1) * columns) + (c - 1)].compare("\\") == 0 && map[((r - 1) * columns) + (c + 1)].compare("\\") == 0) && //top diagonals
-			(map[((r + 1) * columns) + (c - 1)].compare("\\") == 0 && map[((r + 1) * columns) + (c + 1)].compare("\\") == 0)); //bottom diagonals
+	return (map[(r * columns) + c].compare("\\") == 0);
 }
 
 /*

@@ -16,7 +16,6 @@ void Map::importMap()
 	fileName = "maplevel";
 	fileName += lev;
 	readMapData();
-	initializeAllowableArea();
 }
 
 /*
@@ -63,39 +62,12 @@ void Map::readMapData()
 }
 
 /*
- * Initializes the int representeted boolean vector with all ones
- * All of the map is allowable at the beginning of the level
- */
-void Map::initializeAllowableArea()
-{
-	for (int i = 0; i < rows; i++)
-	{
-		std::vector<int> rowVec;
-		for (int j = 0; j < columns; j++)
-		{
-			rowVec.push_back(1);
-		}
-		boolAllowableArea.push_back(rowVec);
-	}
-}
-
-/*
- * Resets the allowable area to be all true again
- * Used during a game over scenario
- */
-void Map::reset()
-{
-	initializeAllowableArea();
-}
-
-/*
  * Loads the next map into member data
  * Clears previous data
  */
 void Map::loadNext()
 {
 	mapData.clear();
-	boolAllowableArea.clear();
 	level++;
 	importMap();
 }
@@ -124,10 +96,3 @@ std::vector<std::vector<std::string> > const &Map::getMapData() const
 	return mapData;
 }
 
-/*
- * returns a read only const pointer version of the allowable area
- */
-std::vector<std::vector<int> > const &Map::getAllowableArea() const
-{
-	return boolAllowableArea;
-}

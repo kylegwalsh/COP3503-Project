@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <ctime>
 
+//a class for creating the map object
 class MapCreator
 {
 private:

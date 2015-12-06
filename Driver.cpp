@@ -12,6 +12,7 @@ int main()
 	for (int i = 0; i < 3; i++)
 	{
 		mC.createNewLevel();
+		mC.addLevel();
 	}
 	Game g;
 	g.start();

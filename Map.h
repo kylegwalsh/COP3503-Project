@@ -8,6 +8,7 @@
 #include <cstring>
 #include <cstdlib>
 
+//a class for the map
 class Map
 {
 private:
@@ -19,7 +20,6 @@ private:
 	int level; //current level
 
 	void readMapData();
-	void initializeAllowableArea();
 	void importMap();
 
 public:
@@ -27,9 +27,7 @@ public:
 	int getColumns();
 	int getRows();
 	void loadNext();
-	void reset();
 	std::vector<std::vector<std::string> > const &getMapData() const;
-	std::vector<std::vector<int> > const &getAllowableArea() const;
 };
 
 #endif //MAP_H

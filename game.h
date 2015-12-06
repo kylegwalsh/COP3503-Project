@@ -10,10 +10,12 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <conio.h>
 #include "character.h"
 #include "Map.h"
 
+//a class that holds the data for game and its various methods
 class Game
 {
 private:
@@ -23,11 +25,12 @@ private:
 	string message;
 	Player al;
 	bool playing;
-	std::vector<std::vector<std::string> > mapData;
-	std::vector<std::vector<int> > allow;
+	vector<vector<string>> mapData;
+	vector<vector<int>> allow;
 	bool keyFound;
 
 	void playLevel();
+	void initializeAllowableArea();
 	void printMap(int playerX, int playerY);
 	void update();
 	void gameOver();
@@ -49,6 +52,7 @@ public:
 	void LevelUpScrn();
 	void QuitScrn();
 	bool Combat(Player *p, Enemy *e);
+	bool NFCombat(Player *p, Enemy *e);
 	bool FinalBossCombat(Player *p, Seminole *e);
 };
 

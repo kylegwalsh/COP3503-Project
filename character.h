@@ -12,6 +12,8 @@
 #include <string>
 #include <sstream>
 #include <random>
+#include <ctime>
+#include <cstdlib>
 #include <vector>
 #include <conio.h>
 using namespace std;
@@ -76,6 +78,7 @@ public:
 	int GetStamina();
 	int GetxLocation();
 	int GetyLocation();
+	int GetLevelUpEXP();
 	string PrintMapStats();
 	string PrintCombatStats();
 	void SaveStats();
