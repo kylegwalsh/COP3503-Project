@@ -1,12 +1,11 @@
 #ifndef MAP_CREATOR_H
 #define MAP_CREATOR_H
 
-
-
 #include <fstream>
 #include <vector>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <cstdlib>
 #include <ctime>
 
