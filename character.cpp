@@ -49,6 +49,11 @@ string Character::GetName()
 	return Name;
 }
 
+mt19937 Character::GetGen()
+{
+	return gen;
+}
+
 //changes a character's health
 void Character::ChangeHealth(int h)
 {

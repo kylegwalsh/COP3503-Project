@@ -37,6 +37,7 @@ public:
 	int GetLevel();
 	int GetDefPower();
 	string GetName();
+	mt19937 GetGen();
 	void ChangeHealth(int h);
 	string Attack(Character *c);
 };

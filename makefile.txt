@@ -1,17 +1,20 @@
-SavingAlberta: MapCreator.o Map.o Character.o Game.o Driver.cpp
-	g++ -o SavingAlberta MapCreator.o Map.o Character.o Game.o Driver.cpp
+SavingAlberta: MapCreator.o Map.o Character.o Game.o Driver.o
+	g++ -Wall -c -std=c++0x -o SavingAlberta MapCreator.o Map.o Character.o Game.o Driver.cpp
+
+Driver.o: Driver.cpp MapCreator.h game.h
+	g++ -Wall -c -std=c++0x -o Driver.o Driver.cpp
 
 MapCreator.o: MapCreator.cpp MapCreator.h
-	g++ -o MapCreator MapCreator.cpp
+	g++ -Wall -c -std=c++0x -o MapCreator MapCreator.cpp
 
 Map.o: Map.cpp Map.h
-	g++ -o Map Map.cpp
+	g++ -Wall -c -std=c++0x -o Map Map.cpp
 
 Character.o: character.cpp character.h
-	g++ -o Character character.cpp
+	g++ -Wall -c -std=c++0x -o Character character.cpp
 
-Game.o: game.cpp game.h
-	g++ -o Game game.cpp
+Game.o: game.cpp game.h Map.h character.h
+	g++ -Wall -c -std=c++0x -o Game game.cpp
 
 Clean: 
-	rm *o SavingAlberta
+	\rm *.o *~ SavingAlberta

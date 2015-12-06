@@ -76,12 +76,13 @@ void Game::playLevel()
 	al.SetLocation(x, y);
 
 	uniform_int_distribution < mt19937::result_type > dist(1, 100);
+	mt19937 gen = al.GetGen();
 	int random;
 
 	while (playing == true && !bossBeaten)
 	{
 		update();
-		random = dist(al.gen);
+		random = dist(gen);
 		moved = false;
 
 		allow = map.getAllowableArea();
@@ -268,7 +269,7 @@ void Game::playLevel()
 				if (random <= 10)
 				{
 					//chooses randomly type 1 or type 2 enemy for level
-					random = dist(al.gen);
+					random = dist(gen);
 					if (random <= 62)
 					{
 						alive = Combat(&al, type1[level - 1]);
