@@ -22,6 +22,7 @@ void Game::start()
 	{
 		playLevel();
 	}
+	Clean();
 }
 
 void Game::setHorizontalPadding()
