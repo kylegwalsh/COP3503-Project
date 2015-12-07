@@ -704,7 +704,7 @@ Centaur::Centaur()
 	Health = MaxHealth;
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
-	Experience = 15 * Level;
+	Experience = 10 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                                                                    |");
 	Ascii.push_back("|                                                                    |");
@@ -742,7 +742,7 @@ Griffin::Griffin()
 	Health = MaxHealth;
 	AttPower = 7 + Level;
 	DefPower = 3 + Level;
-	Experience = 15 * Level;
+	Experience = 10 * Level;
 	Ascii.push_back("======================================================================");
 	Ascii.push_back("|                      ///          ///                              |");
 	Ascii.push_back("|                     ////         ////                              |");

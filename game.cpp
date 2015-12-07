@@ -126,7 +126,7 @@ void Game::playLevel()
 		{
 		case 'w':
 			//if possible, move up
-			if ((y - 1) >= 0)
+			if ((y - 1) >= 0 && allow[y - 1][x])
 			{
 				al.MoveUp();
 				moved = true;
@@ -134,7 +134,7 @@ void Game::playLevel()
 			break;
 		case 's':
 			//if possible, move down
-			if ((y + 1) < map.getRows())
+			if ((y + 1) < map.getRows() && allow[y + 1][x])
 			{
 				al.MoveDown();
 				moved = true;
@@ -142,7 +142,7 @@ void Game::playLevel()
 			break;
 		case 'a':
 			//if possible, move left
-			if ((x - 1) >= 0)
+			if ((x - 1) >= 0 && allow[y][x - 1])
 			{
 				al.MoveLeft();
 				moved = true;
@@ -150,7 +150,7 @@ void Game::playLevel()
 			break;
 		case 'd':
 			//if possible, move right
-			if ((x + 1) < map.getColumns())
+			if ((x + 1) < map.getColumns() && allow[y][x + 1])
 			{
 				al.MoveRight();
 				moved = true;
@@ -196,7 +196,7 @@ void Game::playLevel()
 				//trigger non-fleeable combat
 				if (random > 75 && random <= 85)
 				{
-					playing = NFCombat(&al, type1[level-1]);
+					playing = NFCombat(&al, type1[level - 1]);
 				}
 				//find bed and sleep
 				if (random > 85 && random <= 95)
@@ -302,6 +302,7 @@ void Game::playLevel()
 					if (level == 3)
 					{
 						bossBeaten = FinalBossCombat(&al, &s);
+						playing = true;
 					}
 
 					if (bossBeaten)
@@ -341,8 +342,8 @@ void Game::playLevel()
 			}
 		}
 
-		//check stats
-		if (al.GetHealth() <= 0 || !playing)
+		//check to see if player is dead or quit
+		if (al.GetHealth() == 0 || (!playing && !bossBeaten))
 		{
 			GameOverScrn();
 		}
@@ -684,7 +685,7 @@ void Game::Level3IntroScrn()
 		}
 		if (i == 7)
 		{
-			cout << "|                                    Chapter 3                                    |\n";
+			cout << "|                                    Chapter 3                                   |\n";
 		}
 		if (i == 9)
 		{
@@ -819,6 +820,9 @@ void Game::LevelUpScrn()
 //prints the game over screen
 void Game::GameOverScrn()
 {
+	//sets playing back equal to true and gives the player a chance to try again
+	playing=true;
+
 	ClearScrn();
 	while (playing == true)
 	{
@@ -1044,11 +1048,11 @@ bool Game::Combat(Player *p, Enemy *e)
 		}
 
 		//checks to see if player or enemy is dead
-		if (p->GetHealth() == 0)
+		if (p->GetHealth() <= 0)
 		{
 			return false;
 		}
-		if (e->GetHealth() == 0)
+		if (e->GetHealth() <= 0)
 		{
 			p->GainExperience(e);
 			return true;
@@ -1299,11 +1303,11 @@ bool Game::NFCombat(Player *p, Enemy *e)
 		}
 
 		//checks to see if player or enemy is dead
-		if (p->GetHealth() == 0)
+		if (p->GetHealth() <= 0)
 		{
 			return false;
 		}
-		if (e->GetHealth() == 0)
+		if (e->GetHealth() <= 0)
 		{
 			p->GainExperience(e);
 			return true;
@@ -1554,11 +1558,11 @@ bool Game::FinalBossCombat(Player *p, Seminole *e)
 		}
 
 		//checks to see if player or enemy is dead
-		if (p->GetHealth() == 0)
+		if (p->GetHealth() <= 0)
 		{
 			return false;
 		}
-		if (e->GetHealth() == 0)
+		if (e->GetHealth() <= 0)
 		{
 			if (e->GetHaterade() > 0)
 			{
