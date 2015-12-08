@@ -22,6 +22,7 @@ Game::Game()
 void Game::start()
 {
 	playing = true;
+	quit = false;
 	playLevel();
 }
 
@@ -343,7 +344,7 @@ void Game::playLevel()
 		}
 
 		//check to see if player is dead or quit
-		if (al.GetHealth() == 0 || (!playing && !bossBeaten))
+		if (al.GetHealth() == 0 || (!playing && !bossBeaten && !quit))
 		{
 			GameOverScrn();
 		}
@@ -824,7 +825,7 @@ void Game::GameOverScrn()
 	playing=true;
 
 	ClearScrn();
-	while (playing == true)
+	while (playing == true && !quit)
 	{
 		for (int i = -2; i < 28; i++)
 		{
@@ -925,6 +926,7 @@ void Game::QuitScrn()
 	//continue option which reverts stats and map to what they were at the start of the level
 	if (input == '1')
 	{
+		quit = true;
 		playing = false;
 	}
 	//quit option which ends the program

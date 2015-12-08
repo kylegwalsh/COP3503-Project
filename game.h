@@ -25,6 +25,7 @@ private:
 	string message;
 	Player al;
 	bool playing;
+	bool quit;
 	vector<vector<string>> mapData;
 	vector<vector<int>> allow;
 	bool keyFound;
